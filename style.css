@@ -64,11 +64,19 @@ body {
   cursor: grabbing;
 }
 
+.hud-header-stack {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(4, 6, 13, 0.88) 0%, rgba(4, 6, 13, 0.4) 72%, transparent 100%);
+  padding-bottom: 0.7rem;
+}
+
 .hud-top, .hud-bottom {
   position: relative;
   z-index: 2;
   pointer-events: none;
-  padding: 1.1rem 1.4rem;
+  padding: 1rem 1.4rem;
 }
 
 .hud-top {
@@ -76,27 +84,29 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   gap: 0.75rem;
-  background: linear-gradient(to bottom, rgba(4, 6, 13, 0.86), transparent);
+  padding-bottom: 0.3rem;
 }
 
 .title-block h1 {
-  font-size: 1.32rem;
+  font-size: 1.3rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   background: linear-gradient(90deg, #38bdf8, #c084fc);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .era-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  margin-top: 0.35rem;
-  padding: 0.24rem 0.68rem;
+  margin-top: 0.32rem;
+  padding: 0.22rem 0.66rem;
   border-radius: 999px;
-  font-size: 0.79rem;
+  font-size: 0.78rem;
   font-weight: 600;
   background: rgba(56, 189, 248, 0.14);
   border: 1px solid rgba(56, 189, 248, 0.36);
@@ -120,6 +130,7 @@ body {
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   transition: all 0.16s ease;
 }
@@ -140,39 +151,39 @@ body {
 }
 
 .telemetry-center {
-  position: relative;
-  z-index: 2;
-  pointer-events: none;
   text-align: center;
-  margin-top: 0.1rem;
+  padding: 0.1rem 1rem 0;
 }
 
 .matter-readout {
-  font-size: 2.55rem;
+  font-size: 2.3rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  text-shadow: 0 0 26px rgba(56, 189, 248, 0.48);
+  line-height: 1.1;
+  text-shadow: 0 0 24px rgba(56, 189, 248, 0.45);
 }
 
 .matter-label {
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--text-muted);
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.2rem;
 }
 
 .rates-row {
   display: inline-flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.75rem;
-  background: rgba(10, 15, 30, 0.75);
+  gap: 0.72rem;
+  margin-top: 0.34rem;
+  background: rgba(10, 15, 30, 0.78);
   border: 1px solid var(--border-subtle);
-  padding: 0.38rem 0.92rem;
+  padding: 0.32rem 0.88rem;
   border-radius: 999px;
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
-  font-size: 0.84rem;
+  font-size: 0.82rem;
 }
 
 .rate-pill span {
@@ -193,7 +204,7 @@ body {
   justify-content: space-between;
   align-items: flex-end;
   gap: 1rem;
-  background: linear-gradient(to top, rgba(4, 6, 13, 0.88), transparent);
+  background: linear-gradient(to top, rgba(4, 6, 13, 0.9), transparent);
   font-size: 0.77rem;
   color: var(--text-muted);
 }
@@ -215,8 +226,7 @@ body {
 .autosave-badge {
   font-size: 0.72rem;
   color: var(--accent-green);
-  opacity: 0.85;
-  transition: opacity 0.3s ease;
+  opacity: 0.88;
 }
 
 .structures-bar {
@@ -269,6 +279,7 @@ body {
   display: flex;
   flex-direction: column;
   background: var(--panel-bg);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   height: 100vh;
   overflow: hidden;
@@ -550,13 +561,13 @@ body {
 @media (max-width: 900px) {
   .app-container {
     grid-template-columns: 1fr;
-    grid-template-rows: 48vh 52vh;
+    grid-template-rows: 50vh 50vh;
   }
   .left-panel {
     border-right: none;
     border-bottom: 1px solid var(--border-subtle);
   }
   .matter-readout {
-    font-size: 1.92rem;
+    font-size: 1.8rem;
   }
 }

@@ -12,26 +12,28 @@
     <section class="left-panel" id="leftPanel">
       <canvas id="cosmosCanvas"></canvas>
 
-      <div class="hud-top">
-        <div class="title-block">
-          <h1>Terra to Infinity</h1>
-          <div class="era-badge" id="eraBadge">🌍 Era I: Planet Earth</div>
+      <div class="hud-header-stack">
+        <div class="hud-top">
+          <div class="title-block">
+            <h1>Terra to Infinity</h1>
+            <div class="era-badge" id="eraBadge">🌍 Era I: Planet Earth</div>
+          </div>
+          <div class="controls-bar">
+            <button class="icon-btn" id="musicBtn" title="Toggle Procedural Cosmic Music">🎵 Music On</button>
+            <button class="icon-btn" id="sfxBtn" title="Toggle Sound Effects">🔊 SFX On</button>
+            <button class="icon-btn" id="saveBtn" title="Manual Save (Auto-Save Active)">💾 Save</button>
+            <button class="icon-btn danger" id="resetBtn" title="Wipe Save Data">♻️ Reset</button>
+          </div>
         </div>
-        <div class="controls-bar">
-          <button class="icon-btn" id="musicBtn" title="Toggle Procedural Cosmic Music">🎵 Music On</button>
-          <button class="icon-btn" id="sfxBtn" title="Toggle Sound Effects">🔊 SFX On</button>
-          <button class="icon-btn" id="saveBtn" title="Manual Save (Auto-Save Active)">💾 Save</button>
-          <button class="icon-btn danger" id="resetBtn" title="Wipe Save Data">♻️ Reset</button>
-        </div>
-      </div>
 
-      <div class="telemetry-center">
-        <div class="matter-label">Accumulated Matter</div>
-        <div class="matter-readout" id="matterDisplay">0</div>
-        <div class="rates-row">
-          <div class="rate-pill">⚡ <span id="mpsDisplay">0.00</span> / sec</div>
-          <div class="rate-pill click">👆 <span id="mpcDisplay">1.00</span> / click</div>
-          <div class="rate-pill dark" id="darkEnergyPill" style="display: none;">🌌 <span id="deBonusDisplay">+0%</span> Dark Energy</div>
+        <div class="telemetry-center">
+          <div class="matter-label">Accumulated Matter</div>
+          <div class="matter-readout" id="matterDisplay">0</div>
+          <div class="rates-row">
+            <div class="rate-pill">⚡ <span id="mpsDisplay">0.00</span> / sec</div>
+            <div class="rate-pill click">👆 <span id="mpcDisplay">1.00</span> / click</div>
+            <div class="rate-pill dark" id="darkEnergyPill" style="display: none;">🌌 <span id="deBonusDisplay">+0%</span> Dark Energy</div>
+          </div>
         </div>
       </div>
 
