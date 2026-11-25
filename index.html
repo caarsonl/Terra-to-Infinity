@@ -8,7 +8,7 @@
 </head>
 <body>
   <div class="app-container">
-    <!-- Left Panel: 3D Interactive Canvas & Telemetry -->
+    <!-- Left Panel: 3D Interactive Canvas & Multi-Currency Telemetry -->
     <section class="left-panel" id="leftPanel">
       <canvas id="cosmosCanvas"></canvas>
 
@@ -29,10 +29,13 @@
         <div class="telemetry-center">
           <div class="matter-label">Accumulated Matter</div>
           <div class="matter-readout" id="matterDisplay">0</div>
+
           <div class="rates-row">
-            <div class="rate-pill">⚡ <span id="mpsDisplay">0.00</span> / sec</div>
+            <div class="rate-pill">💠 <span id="mpsDisplay">0.00</span> / s</div>
             <div class="rate-pill click">👆 <span id="mpcDisplay">1.00</span> / click</div>
-            <div class="rate-pill dark" id="darkEnergyPill" style="display: none;">🌌 <span id="deBonusDisplay">+0%</span> Dark Energy</div>
+            <div class="rate-pill energy">⚡ <span id="energyDisplay">0</span> <small>(+<span id="epsDisplay">0</span>/s)</small></div>
+            <div class="rate-pill antimatter" id="antimatterPill" style="display: none;">⚛️ <span id="antimatterDisplay">0</span> <small>(+<span id="ampsDisplay">0</span>/s)</small></div>
+            <div class="rate-pill dark" id="darkEnergyPill" style="display: none;">🌌 <span id="deBonusDisplay">0 DE</span></div>
           </div>
         </div>
       </div>
@@ -49,12 +52,13 @@
       </div>
     </section>
 
-    <!-- Right Panel: Upgrades, Cosmic Eras & Big Crunch -->
+    <!-- Right Panel: Generators, Research Lab, Cosmic Eras & Big Crunch -->
     <aside class="right-panel">
       <nav class="nav-tabs">
-        <button class="tab-btn active" data-tab="generators">⚙️ Generators</button>
-        <button class="tab-btn" data-tab="eras">🌠 Cosmic Eras</button>
-        <button class="tab-btn" data-tab="prestige">🕳️ Big Crunch</button>
+        <button class="tab-btn active" data-tab="generators">⚙️ Build</button>
+        <button class="tab-btn" data-tab="research">🔬 Research</button>
+        <button class="tab-btn" data-tab="eras">🌠 Eras</button>
+        <button class="tab-btn" data-tab="prestige">🕳️ Crunch</button>
       </nav>
       <div class="scroll-area" id="tabContent"></div>
     </aside>

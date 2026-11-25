@@ -24,7 +24,7 @@
   }
 
   /* =========================================================================
-     2. PROCEDURAL WEB AUDIO ENGINE (SFX + AUTO AMBIENT COSMIC SOUNDTRACK)
+     2. PROCEDURAL WEB AUDIO ENGINE (SFX + 10-ERA AUTO AMBIENT SOUNDTRACK)
   ========================================================================= */
   class SoundEngine {
     constructor() {
@@ -43,7 +43,7 @@
         if (AudioCtx) {
           this.ctx = new AudioCtx();
           this.musicMaster = this.ctx.createGain();
-          this.musicMaster.gain.value = this.musicEnabled ? 0.16 : 0;
+          this.musicMaster.gain.value = this.musicEnabled ? 0.15 : 0;
           this.musicMaster.connect(this.ctx.destination);
         }
       }
@@ -60,7 +60,7 @@
       if (this.ctx && this.musicMaster) {
         const now = this.ctx.currentTime;
         this.musicMaster.gain.cancelScheduledValues(now);
-        this.musicMaster.gain.linearRampToValueAtTime(enabled ? 0.16 : 0.0001, now + 0.45);
+        this.musicMaster.gain.linearRampToValueAtTime(enabled ? 0.15 : 0.0001, now + 0.45);
       }
       if (enabled && !this.musicStarted && this.ctx) {
         this.startAmbientMusic();
@@ -72,13 +72,16 @@
       this.musicStarted = true;
 
       const eraScales = [
-        [261.63, 293.66, 329.63, 392.00, 440.00, 523.25],
-        [293.66, 329.63, 369.99, 440.00, 493.88, 587.33],
-        [220.00, 261.63, 329.63, 392.00, 440.00, 523.25],
-        [196.00, 233.08, 293.66, 349.23, 392.00, 466.16],
-        [174.61, 220.00, 261.63, 329.63, 349.23, 440.00],
-        [164.81, 196.00, 246.94, 293.66, 329.63, 493.88],
-        [261.63, 329.63, 392.00, 493.88, 587.33, 783.99]
+        [261.63, 293.66, 329.63, 392.00, 440.00, 523.25], // Era 0: Earth
+        [293.66, 329.63, 369.99, 440.00, 493.88, 587.33], // Era 1: Solar
+        [220.00, 261.63, 329.63, 392.00, 440.00, 523.25], // Era 2: Cluster
+        [196.00, 233.08, 293.66, 349.23, 392.00, 466.16], // Era 3: Milky Way
+        [246.94, 293.66, 369.99, 440.00, 493.88, 587.33], // Era 4: Local Group
+        [174.61, 220.00, 261.63, 329.63, 349.23, 440.00], // Era 5: Laniakea
+        [164.81, 196.00, 246.94, 293.66, 329.63, 493.88], // Era 6: Universe
+        [207.65, 246.94, 311.13, 369.99, 415.30, 554.37], // Era 7: Multiverse
+        [261.63, 329.63, 392.00, 493.88, 587.33, 783.99], // Era 8: Omniverse
+        [293.66, 369.99, 440.00, 554.37, 659.25, 880.00]  // Era 9: Architect's Void
       ];
 
       const scheduleStep = () => {
@@ -93,7 +96,6 @@
             const osc = this.ctx.createOscillator();
             const filter = this.ctx.createBiquadFilter();
             const gain = this.ctx.createGain();
-
             osc.type = idx === 0 ? "sine" : "triangle";
             osc.frequency.setValueAtTime(freq, now);
             filter.type = "lowpass";
@@ -111,15 +113,14 @@
           });
         }
 
-        if (Math.random() < 0.78) {
-          const note = scale[Math.floor(Math.random() * scale.length)] * (Math.random() > 0.7 ? 2 : 1);
+        if (Math.random() < 0.76) {
+          const note = scale[Math.floor(Math.random() * scale.length)] * (Math.random() > 0.72 ? 2 : 1);
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
-
           osc.type = "sine";
           osc.frequency.setValueAtTime(note, now);
           gain.gain.setValueAtTime(0.001, now);
-          gain.gain.linearRampToValueAtTime(0.14, now + 0.08);
+          gain.gain.linearRampToValueAtTime(0.13, now + 0.08);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 2.1);
 
           osc.connect(gain);
@@ -142,14 +143,13 @@
       const now = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      const baseFreqs = [300, 360, 420, 480, 540, 600, 680];
-      const freq = (baseFreqs[eraIndex] || 400) + (Math.random() * 40 - 20);
+      const freq = 290 + eraIndex * 42 + (Math.random() * 36 - 18);
 
-      osc.type = eraIndex >= 3 ? "sine" : "triangle";
+      osc.type = eraIndex >= 4 ? "sine" : "triangle";
       osc.frequency.setValueAtTime(freq, now);
-      osc.frequency.exponentialRampToValueAtTime(freq * 1.45, now + 0.075);
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.44, now + 0.075);
 
-      gain.gain.setValueAtTime(0.09, now);
+      gain.gain.setValueAtTime(0.085, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.085);
 
       osc.connect(gain);
@@ -168,11 +168,9 @@
         const gain = this.ctx.createGain();
         osc.type = "sine";
         osc.frequency.setValueAtTime(freq, now + idx * 0.04);
-
         gain.gain.setValueAtTime(0.001, now + idx * 0.04);
         gain.gain.linearRampToValueAtTime(0.07, now + idx * 0.04 + 0.015);
         gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.04 + 0.2);
-
         osc.connect(gain);
         gain.connect(this.ctx.destination);
         osc.start(now + idx * 0.04);
@@ -191,11 +189,9 @@
         osc.type = i % 2 === 0 ? "sine" : "triangle";
         osc.frequency.setValueAtTime(f * 0.72, now);
         osc.frequency.exponentialRampToValueAtTime(f * 1.5, now + 0.8);
-
         gain.gain.setValueAtTime(0.001, now);
         gain.gain.linearRampToValueAtTime(0.075, now + 0.14);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.96);
-
         osc.connect(gain);
         gain.connect(this.ctx.destination);
         osc.start(now);
@@ -213,10 +209,8 @@
       osc.type = "sawtooth";
       osc.frequency.setValueAtTime(190, now);
       osc.frequency.exponentialRampToValueAtTime(34, now + 1.15);
-
       gain.gain.setValueAtTime(0.14, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start(now);
@@ -227,148 +221,194 @@
   const audio = new SoundEngine();
 
   /* =========================================================================
-     3. GAME DATA: 7 COSMIC ERAS, BALANCED CLICK UPGRADES & 21 GENERATORS
+     3. GAME DATA: 10 ERAS, 4 CURRENCIES, 30 GENERATORS, 10 CLICKS,
+        16 RESEARCH TECHS & 5 PERMANENT DARK ENERGY PERKS
   ========================================================================= */
   const ERAS = [
     {
-      id: 0, name: "Planet Earth", badge: "🌍 Era I: Planet Earth", cost: 0, mult: 1,
-      desc: "An HD rotating ocean world with volumetric clouds, mountain relief, and orbital potential.",
-      bonusText: "Starting Cosmic Scale (1x)"
+      id: 0, name: "Planet Earth", badge: "🌍 Era I: Planet Earth",
+      costM: 0, costE: 0, costA: 0, mult: 1,
+      desc: "An ultra-HD rotating ocean world with volumetric clouds, mountain relief, and orbital potential.",
+      bonusText: "Starting Scale (1x)"
     },
     {
-      id: 1, name: "Solar System", badge: "☀️ Era II: Solar System", cost: 12000, mult: 2,
-      desc: "Harness a turbulent 3D star and seven GPU-shaded worlds in Keplerian orbit.",
-      bonusText: "Unlocks Solar tech & 2x global Matter output"
+      id: 1, name: "Solar System", badge: "☀️ Era II: Solar System",
+      costM: 25000, costE: 1200, costA: 0, mult: 1.8,
+      desc: "Harness a turbulent 3D Sun and all 8 planets from Mercury to Neptune.",
+      bonusText: "1.8x Output • Unlocks Solar System tech"
     },
     {
-      id: 2, name: "Local Star Cluster", badge: "✨ Era III: Local Star Cluster", cost: 4000000, mult: 4,
+      id: 2, name: "Local Star Cluster", badge: "✨ Era III: Local Star Cluster",
+      costM: 18000000, costE: 650000, costA: 0, mult: 3.2,
       desc: "Link neighboring blue supergiants and red dwarfs across an interstellar nursery.",
-      bonusText: "Unlocks Star Cluster tech & 4x global Matter output"
+      bonusText: "3.2x Output • Unlocks Star Cluster tech"
     },
     {
-      id: 3, name: "Milky Way", badge: "🌀 Era IV: Milky Way", cost: 1500000000, mult: 8,
+      id: 3, name: "Milky Way", badge: "🌀 Era IV: Milky Way",
+      costM: 1.5e10, costE: 4.5e8, costA: 0, mult: 5.5,
       desc: "Command a 3D spiral galaxy teeming with nebulae, pulsars, and Sagittarius A*.",
-      bonusText: "Unlocks Galactic tech & 8x global Matter output"
+      bonusText: "5.5x Output • Unlocks Antimatter (⚛️) synthesis"
     },
     {
-      id: 4, name: "Laniakea Supercluster", badge: "🎇 Era V: Laniakea Supercluster", cost: 500000000000, mult: 16,
+      id: 4, name: "Local Group", badge: "💫 Era V: Local Group",
+      costM: 1.4e13, costE: 3.5e11, costA: 2500, mult: 9.5,
+      desc: "Witness the 3D merger of Andromeda and the Milky Way across intergalactic tides.",
+      bonusText: "9.5x Output • Unlocks Intergalactic tech"
+    },
+    {
+      id: 5, name: "Laniakea Supercluster", badge: "🎇 Era VI: Laniakea Supercluster",
+      costM: 1.8e16, costE: 3.8e14, costA: 350000, mult: 16,
       desc: "Guide hundreds of spinning galaxies flowing toward the Great Attractor.",
-      bonusText: "Unlocks Supercluster tech & 16x global Matter output"
+      bonusText: "16x Output • Unlocks Supercluster tech"
     },
     {
-      id: 5, name: "Observable Universe", badge: "🌌 Era VI: Observable Universe", cost: 180000000000000, mult: 32,
+      id: 6, name: "Observable Universe", badge: "🌌 Era VII: Observable Universe",
+      costM: 2.5e19, costE: 4.5e17, costA: 6e7, mult: 28,
       desc: "Architect a 3D cosmic web of superclusters, blazing quasars, and vacuum engines.",
-      bonusText: "Unlocks Universal tech, 32x output & Big Crunch"
+      bonusText: "28x Output • Unlocks Big Crunch Prestige (🌌)"
     },
     {
-      id: 6, name: "The Omniverse", badge: "💠 Era VII: The Omniverse", cost: 65000000000000000, mult: 64,
-      desc: "Ascend beyond spacetime to weave 4D hypercubes and infinite Bubble Universes.",
-      bonusText: "Unlocks Omniversal tech & 64x global Matter output"
+      id: 7, name: "The Multiverse", badge: "🫧 Era VIII: The Multiverse",
+      costM: 4.5e23, costE: 6e21, costA: 1.2e10, mult: 52,
+      desc: "Stack parallel 3D cosmic branes floating in shimmering quantum foam.",
+      bonusText: "52x Output • Unlocks Multiverse tech"
+    },
+    {
+      id: 8, name: "The Omniverse", badge: "💠 Era IX: The Omniverse",
+      costM: 1.2e28, costE: 1.5e26, costA: 3e12, mult: 100,
+      desc: "Weave 4D rotating hypercubes and infinite iridescent Bubble Universes.",
+      bonusText: "100x Output • Unlocks 4D Omniversal tech"
+    },
+    {
+      id: 9, name: "The Architect's Void", badge: "👑 Era X: The Architect's Void",
+      costM: 5e33, costE: 4e31, costA: 1e15, mult: 220,
+      desc: "Transcend all dimensions inside a golden 3D Sacred Geometry Merkaba core.",
+      bonusText: "220x Output • Final Endgame Ascendancy"
     }
   ];
 
+  // Rebalanced Click Amplifiers: steep 1.42x cost, modest additive bonus + capped 8% MPS synergy
   const CLICK_UPGRADES = [
-    {
-      id: "clk_1", name: "Tectonic Drill", icon: "⛏️", era: 0,
-      baseCost: 30, powerAdd: 1, addMult: 0.12, mpsPct: 0.002,
-      desc: "+1 base click, +12% click bonus, +0.2% MPS per click.",
-      visual: "3D Visual: Glowing magma fissures & mining laser"
-    },
-    {
-      id: "clk_2", name: "Orbital Mass Driver", icon: "🛰️", era: 1,
-      baseCost: 8000, powerAdd: 25, addMult: 0.15, mpsPct: 0.003,
-      desc: "+25 base click, +15% click bonus, +0.3% MPS per click.",
-      visual: "3D Visual: Golden railgun ring & solar bolts"
-    },
-    {
-      id: "clk_3", name: "Stellar Flare Lance", icon: "⚡", era: 2,
-      baseCost: 2500000, powerAdd: 600, addMult: 0.18, mpsPct: 0.004,
-      desc: "+600 base click, +18% click bonus, +0.4% MPS per click.",
-      visual: "3D Visual: Star-to-star plasma arc discharges"
-    },
-    {
-      id: "clk_4", name: "Hypernova Pulse", icon: "💥", era: 3,
-      baseCost: 900000000, powerAdd: 15000, addMult: 0.2, mpsPct: 0.005,
-      desc: "+15K base click, +20% click bonus, +0.5% MPS per click.",
-      visual: "3D Visual: Expanding 3D galactic shockwave rings"
-    },
-    {
-      id: "clk_5", name: "Gravitational Wave Cannon", icon: "🌊", era: 4,
-      baseCost: 300000000000, powerAdd: 400000, addMult: 0.22, mpsPct: 0.006,
-      desc: "+400K base click, +22% click bonus, +0.6% MPS per click.",
-      visual: "3D Visual: Spacetime ripples across the supercluster"
-    },
-    {
-      id: "clk_6", name: "Vacuum Zero-Point Tap", icon: "✨", era: 5,
-      baseCost: 110000000000000, powerAdd: 12000000, addMult: 0.25, mpsPct: 0.007,
-      desc: "+12M base click, +25% click bonus, +0.7% MPS per click.",
-      visual: "3D Visual: Quantum lightning cascading across the web"
-    },
-    {
-      id: "clk_7", name: "Omniversal Singularity Spark", icon: "🔮", era: 6,
-      baseCost: 40000000000000000, powerAdd: 400000000, addMult: 0.3, mpsPct: 0.008,
-      desc: "+400M base click, +30% click bonus, +0.8% MPS per click.",
-      visual: "3D Visual: 4D hyper-dimensional shock pulses"
-    }
+    { id: "clk_1", name: "Tectonic Drill", icon: "⛏️", era: 0, baseCost: 35, powerAdd: 1, addMult: 0.08, mpsPct: 0.001, desc: "+1 base click, +8% click mult, +0.1% MPS/click.", visual: "3D: Magma fissures & orbital mining laser" },
+    { id: "clk_2", name: "Orbital Mass Driver", icon: "🛰️", era: 1, baseCost: 14000, powerAdd: 18, addMult: 0.1, mpsPct: 0.0015, desc: "+18 base click, +10% click mult, +0.15% MPS/click.", visual: "3D: Golden railgun ring & solar bolts" },
+    { id: "clk_3", name: "Stellar Flare Lance", icon: "⚡", era: 2, baseCost: 9000000, powerAdd: 450, addMult: 0.12, mpsPct: 0.002, desc: "+450 base click, +12% click mult, +0.2% MPS/click.", visual: "3D: Star-to-star plasma arcs" },
+    { id: "clk_4", name: "Hypernova Pulse", icon: "💥", era: 3, baseCost: 8e9, powerAdd: 14000, addMult: 0.14, mpsPct: 0.0025, desc: "+14K base click, +14% click mult, +0.25% MPS/click.", visual: "3D: Expanding galactic shockwave rings" },
+    { id: "clk_5", name: "Tidal Collision Lance", icon: "💫", era: 4, baseCost: 7e12, powerAdd: 420000, addMult: 0.15, mpsPct: 0.003, desc: "+420K base click, +15% click mult, +0.3% MPS/click.", visual: "3D: Dual-galaxy shock ripples" },
+    { id: "clk_6", name: "Gravitational Wave Cannon", icon: "🌊", era: 5, baseCost: 9e15, powerAdd: 1.4e7, addMult: 0.16, mpsPct: 0.003, desc: "+14M base click, +16% click mult, +0.3% MPS/click.", visual: "3D: Spacetime waves across Laniakea" },
+    { id: "clk_7", name: "Vacuum Zero-Point Tap", icon: "✨", era: 6, baseCost: 1.4e19, powerAdd: 5e8, addMult: 0.18, mpsPct: 0.0035, desc: "+500M base click, +18% click mult, +0.35% MPS/click.", visual: "3D: Quantum arcs across cosmic web" },
+    { id: "clk_8", name: "Brane Resonance Hammer", icon: "🫧", era: 7, baseCost: 2.5e23, powerAdd: 2e10, addMult: 0.2, mpsPct: 0.004, desc: "+20B base click, +20% click mult, +0.4% MPS/click.", visual: "3D: Parallel brane harmonic pulses" },
+    { id: "clk_9", name: "Omniversal Spark", icon: "🔮", era: 8, baseCost: 6e27, powerAdd: 8e11, addMult: 0.22, mpsPct: 0.004, desc: "+800B base click, +22% click mult, +0.4% MPS/click.", visual: "3D: 4D hyper-dimensional bursts" },
+    { id: "clk_10", name: "Architect's Axiom", icon: "👑", era: 9, baseCost: 2e33, powerAdd: 4e13, addMult: 0.25, mpsPct: 0.005, desc: "+40T base click, +25% click mult, +0.5% MPS/click.", visual: "3D: Golden Merkaba reality flash" }
   ];
 
+  // 30 Generators across 10 Eras (produce Matter/s, Energy/s, and Antimatter/s from Era IV+)
   const GENERATORS = [
     // Era 0: Planet Earth
-    { id: "gen_1", name: "Core Extractor", icon: "🌋", era: 0, baseCost: 15, baseMps: 0.5, desc: "Siphons dense silicate and iron from Earth's mantle.", visual: "3D Visual: Night-side megacities & orbiting magma siphons" },
-    { id: "gen_2", name: "Lunar Colony", icon: "🌑", era: 0, baseCost: 120, baseMps: 4, desc: "Automated regolith harvesters across Luna.", visual: "3D Visual: Lit lunar domes & Earth-Moon shuttle arcs" },
-    { id: "gen_3", name: "Space Elevator", icon: "🗼", era: 0, baseCost: 1100, baseMps: 28, desc: "Geostationary orbital tether network.", visual: "3D Visual: 3D tether towers, climbers & orbital ring" },
+    { id: "gen_1", name: "Core Extractor", icon: "🌋", era: 0, baseCost: 15, mps: 0.4, eps: 0.05, amps: 0, desc: "Siphons silicate & geothermal heat from Earth's mantle.", visual: "3D: Night-side megacities & thermal satellites" },
+    { id: "gen_2", name: "Lunar Colony", icon: "🌑", era: 0, baseCost: 140, mps: 3.2, eps: 0.35, amps: 0, desc: "Helium-3 & regolith mines across Luna.", visual: "3D: Lit cyan lunar bases & shuttle arcs" },
+    { id: "gen_3", name: "Space Elevator", icon: "🗼", era: 0, baseCost: 1350, mps: 24, eps: 2.8, amps: 0, desc: "Geostationary orbital tether network.", visual: "3D: Tether towers, climbers & orbital ring" },
 
     // Era 1: Solar System
-    { id: "gen_4", name: "Asteroid Belt Miner", icon: "☄️", era: 1, baseCost: 10000, baseMps: 220, desc: "Autonomous drones dismantling metallic asteroids.", visual: "3D Visual: 3D faceted asteroid belt & mining lasers" },
-    { id: "gen_5", name: "Gas Giant Harvester", icon: "🪐", era: 1, baseCost: 85000, baseMps: 1500, desc: "Atmospheric scoops skimming Jupiter and Saturn.", visual: "3D Visual: Orbiting collector halos & siphon beams" },
-    { id: "gen_6", name: "Dyson Swarm", icon: "🔆", era: 1, baseCost: 680000, baseMps: 10500, desc: "Millions of solar mirrors capturing stellar output.", visual: "3D Visual: Nested golden hexagonal Dyson rings" },
+    { id: "gen_4", name: "Asteroid Belt Miner", icon: "☄️", era: 1, baseCost: 18000, mps: 190, eps: 18, amps: 0, desc: "Swarms dismantling metallic main-belt asteroids.", visual: "3D: Faceted asteroid belt & mining lasers" },
+    { id: "gen_5", name: "Gas Giant Harvester", icon: "🪐", era: 1, baseCost: 195000, mps: 1450, eps: 145, amps: 0, desc: "Scoops skimming Jupiter, Saturn, Uranus & Neptune.", visual: "3D: Collector halos & atmospheric siphons" },
+    { id: "gen_6", name: "Dyson Swarm", icon: "🔆", era: 1, baseCost: 2100000, mps: 11500, eps: 1400, amps: 0, desc: "Nested golden mirrors harvesting total solar flux.", visual: "3D: Nested golden hexagonal Dyson rings" },
 
     // Era 2: Local Star Cluster
-    { id: "gen_7", name: "Stellar Nursery Scoop", icon: "☁️", era: 2, baseCost: 3500000, baseMps: 72000, desc: "Harvests ionized hydrogen clouds birthing new suns.", visual: "3D Visual: Glowing volumetric stellar gas clouds" },
-    { id: "gen_8", name: "Star-Lifting Ring", icon: "💍", era: 2, baseCost: 30000000, baseMps: 520000, desc: "Magnetic accelerators stripping plasma from giant stars.", visual: "3D Visual: Rotating luminous rings around cluster stars" },
-    { id: "gen_9", name: "Interstellar Warp Gate", icon: "🌀", era: 2, baseCost: 260000000, baseMps: 3800000, desc: "Links neighboring star systems via subspace conduits.", visual: "3D Visual: Cyan hyperspace trade lanes between stars" },
+    { id: "gen_7", name: "Stellar Nursery Scoop", icon: "☁️", era: 2, baseCost: 2.2e7, mps: 95000, eps: 9500, amps: 0, desc: "Harvests ionized hydrogen clouds birthing new suns.", visual: "3D: Glowing volumetric stellar nurseries" },
+    { id: "gen_8", name: "Star-Lifting Ring", icon: "💍", era: 2, baseCost: 2.6e8, mps: 780000, eps: 82000, amps: 0, desc: "Magnetic rings stripping plasma from blue supergiants.", visual: "3D: Rotating golden rings around stars" },
+    { id: "gen_9", name: "Interstellar Warp Gate", icon: "🌀", era: 2, baseCost: 3.1e9, mps: 6.4e6, eps: 720000, amps: 0, desc: "Subspace trade conduits linking nearby stars.", visual: "3D: Cyan hyperspace lanes between stars" },
 
-    // Era 3: Milky Way
-    { id: "gen_10", name: "Nebula Condenser", icon: "🌫️", era: 3, baseCost: 1200000000, baseMps: 28000000, desc: "Compresses molecular clouds into pure baryonic matter.", visual: "3D Visual: Spiral 3D pink & cyan star-forming nebulae" },
-    { id: "gen_11", name: "Pulsar Array", icon: "📡", era: 3, baseCost: 10000000000, baseMps: 210000000, desc: "Harvests relativistic beams from spinning neutron stars.", visual: "3D Visual: Spinning 3D pulsars with sweeping twin beams" },
-    { id: "gen_12", name: "Sagittarius Penrose Engine", icon: "🕳️", era: 3, baseCost: 90000000000, baseMps: 1600000000, desc: "Extracts ergosphere energy from the galactic black hole.", visual: "3D Visual: 3D Black Hole accretion disk & polar jets" },
+    // Era 3: Milky Way (Unlocks Antimatter!)
+    { id: "gen_10", name: "Nebula Condenser", icon: "🌫️", era: 3, baseCost: 3.2e10, mps: 5.5e7, eps: 5.5e6, amps: 0.4, desc: "Compresses molecular clouds & traps stray positrons.", visual: "3D: Spiral pink & cyan nebulae" },
+    { id: "gen_11", name: "Pulsar Array", icon: "📡", era: 3, baseCost: 4.0e11, mps: 4.8e8, eps: 4.8e7, amps: 3.2, desc: "Harvests relativistic beams & antimatter pairs.", visual: "3D: Spinning pulsars with twin beams" },
+    { id: "gen_12", name: "Sagittarius Penrose Engine", icon: "🕳️", era: 3, baseCost: 5.0e12, mps: 4.2e9, eps: 4.5e8, amps: 26, desc: "Extracts ergosphere mass from the galactic core.", visual: "3D: Black Hole accretion disk & jets" },
 
-    // Era 4: Laniakea Supercluster
-    { id: "gen_13", name: "Galactic Tidal Siphon", icon: "🌌", era: 4, baseCost: 420000000000, baseMps: 12000000000, desc: "Captures streams of stars torn between colliding galaxies.", visual: "3D Visual: Luminous stellar bridges linking galaxies" },
-    { id: "gen_14", name: "Dark Matter Conduit", icon: "🧬", era: 4, baseCost: 3600000000000, baseMps: 95000000000, desc: "Channels invisible gravitational rivers across clusters.", visual: "3D Visual: Pulsing violet gravitational flow streams" },
-    { id: "gen_15", name: "Great Attractor Tap", icon: "🔆", era: 4, baseCost: 32000000000000, baseMps: 740000000000, desc: "Harnesses the central gravity anomaly of Laniakea.", visual: "3D Visual: Radiant 3D vortex pulling galaxies inward" },
+    // Era 4: Local Group (Andromeda + Milky Way Merger)
+    { id: "gen_13", name: "Andromeda Bridge Collector", icon: "🌉", era: 4, baseCost: 4.5e13, mps: 3.8e10, eps: 3.8e9, amps: 210, desc: "Harvests stars flung between Milky Way & Andromeda.", visual: "3D: Luminous tidal stream linking both galaxies" },
+    { id: "gen_14", name: "Dwarf Galaxy Mill", icon: "🌀", era: 4, baseCost: 5.8e14, mps: 3.4e11, eps: 3.4e10, amps: 1750, desc: "Strips Triangulum & Magellanic satellite galaxies.", visual: "3D: Orbiting satellite dwarf galaxies" },
+    { id: "gen_15", name: "Binary Core Collider", icon: "💥", era: 4, baseCost: 7.5e15, mps: 3.1e12, eps: 3.2e11, amps: 14500, desc: "Harnesses dual supermassive black hole inspirals.", visual: "3D: Gravitational energy vortex between cores" },
 
-    // Era 5: Observable Universe
-    { id: "gen_16", name: "Quasar Siphon", icon: "🌠", era: 5, baseCost: 150000000000000, baseMps: 5800000000000, desc: "Taps active galactic nuclei outshining entire galaxies.", visual: "3D Visual: Blazing twin-jet Quasars on web nodes" },
-    { id: "gen_17", name: "Cosmic Filament Loom", icon: "🕸️", era: 5, baseCost: 1300000000000000, baseMps: 46000000000000, desc: "Supercharges dark matter highways across the cosmos.", visual: "3D Visual: Streaming energy pulses along cosmic web" },
-    { id: "gen_18", name: "Vacuum Metastability Engine", icon: "⚛️", era: 5, baseCost: 12000000000000000, baseMps: 360000000000000, desc: "Extracts zero-point energy from false vacuum pockets.", visual: "3D Visual: Shimmering quantum energy shells in web" },
+    // Era 5: Laniakea Supercluster
+    { id: "gen_16", name: "Galactic Tidal Siphon", icon: "🌌", era: 5, baseCost: 6.5e16, mps: 2.9e13, eps: 2.8e12, amps: 120000, desc: "Links colliding galaxy clusters across Laniakea.", visual: "3D: Blue stellar bridges across clusters" },
+    { id: "gen_17", name: "Dark Matter Conduit", icon: "🧬", era: 5, baseCost: 8.5e17, mps: 2.7e14, eps: 2.6e13, amps: 1.0e6, desc: "Channels invisible gravitational rivers.", visual: "3D: Violet dark matter flow streams" },
+    { id: "gen_18", name: "Great Attractor Tap", icon: "🔆", era: 5, baseCost: 1.1e19, mps: 2.5e15, eps: 2.5e14, amps: 8.5e6, desc: "Taps the gravitational heart of Laniakea.", visual: "3D: Radiant Great Attractor vortex" },
 
-    // Era 6: The Omniverse
-    { id: "gen_19", name: "Bubble Universe Harvester", icon: "🫧", era: 6, baseCost: 55000000000000000, baseMps: 2800000000000000, desc: "Siphons physical constants from neighboring universes.", visual: "3D Visual: Spawns iridescent orbiting Bubble Universes" },
-    { id: "gen_20", name: "Wormhole Bridge Network", icon: "🌉", era: 6, baseCost: 480000000000000000, baseMps: 22000000000000000, desc: "Connects parallel universes with Einstein-Rosen bridges.", visual: "3D Visual: Glowing 3D wormhole arcs between bubbles" },
-    { id: "gen_21", name: "4D Hypercube Reality Loom", icon: "💠", era: 6, baseCost: 4500000000000000000, baseMps: 180000000000000000, desc: "Weaves fresh space, time, and matter from higher dimensions.", visual: "3D Visual: Expands rotating 4D Tesseract & gyro rings" }
+    // Era 6: Observable Universe
+    { id: "gen_19", name: "Quasar Siphon", icon: "🌠", era: 6, baseCost: 9.0e19, mps: 2.4e16, eps: 2.3e15, amps: 7.2e7, desc: "Taps active galactic nuclei outshining entire clusters.", visual: "3D: Twin-jet Quasars on web nodes" },
+    { id: "gen_20", name: "Cosmic Filament Loom", icon: "🕸️", era: 6, baseCost: 1.4e21, mps: 2.4e17, eps: 2.2e16, amps: 6.2e8, desc: "Supercharges supercluster highways.", visual: "3D: Flowing energy pulses along web" },
+    { id: "gen_21", name: "Vacuum Metastability Engine", icon: "⚛️", era: 6, baseCost: 2.2e22, mps: 2.5e18, eps: 2.4e17, amps: 5.5e9, desc: "Harvests zero-point potential from false vacuum.", visual: "3D: Shimmering quantum energy shells" },
+
+    // Era 7: The Multiverse
+    { id: "gen_22", name: "Quantum Foam Skimmer", icon: "🫧", era: 7, baseCost: 2.0e24, mps: 2.8e19, eps: 2.5e18, amps: 5.0e10, desc: "Extracts virtual particles from Planck-scale foam.", visual: "3D: Luminous quantum foam waves" },
+    { id: "gen_23", name: "Parallel Brane Anchor", icon: "🧊", era: 7, baseCost: 3.5e25, mps: 3.2e20, eps: 2.9e19, amps: 4.5e11, desc: "Pins neighboring 3D universe membranes together.", visual: "3D: Stacked glowing cosmic brane planes" },
+    { id: "gen_24", name: "Chronos Rift Conduit", icon: "⏳", era: 7, baseCost: 6.0e26, mps: 3.8e21, eps: 3.5e20, amps: 4.2e12, desc: "Siphons entropy gradients between parallel timelines.", visual: "3D: Vertical golden inter-brane conduits" },
+
+    // Era 8: The Omniverse
+    { id: "gen_25", name: "Bubble Universe Harvester", icon: "🫧", era: 8, baseCost: 5.0e28, mps: 4.8e22, eps: 4.2e21, amps: 4.0e13, desc: "Siphons physical constants from sibling universes.", visual: "3D: Iridescent orbiting Bubble Universes" },
+    { id: "gen_26", name: "Wormhole Bridge Network", icon: "🌉", era: 8, baseCost: 9.0e29, mps: 6.0e23, eps: 5.4e22, amps: 3.8e14, desc: "Weaves Einstein-Rosen highways across bubbles.", visual: "3D: Glowing wormhole arcs between bubbles" },
+    { id: "gen_27", name: "4D Hypercube Reality Loom", icon: "💠", era: 8, baseCost: 1.8e31, mps: 8.0e24, eps: 7.2e23, amps: 3.5e15, desc: "Extrudes space and mass from 4D projections.", visual: "3D: Expanding 4D Tesseract & gyro rings" },
+
+    // Era 9: The Architect's Void
+    { id: "gen_28", name: "Platonic Axiom Forge", icon: "🔷", era: 9, baseCost: 2.0e34, mps: 1.4e26, eps: 1.2e25, amps: 4.0e16, desc: "Crystallizes pure mathematics into infinite matter.", visual: "3D: Orbiting geometric polyhedron shards" },
+    { id: "gen_29", name: "Golden Merkaba Resonator", icon: "✨", era: 9, baseCost: 4.5e35, mps: 2.4e27, eps: 2.0e26, amps: 5.0e17, desc: "Spins counter-rotating star tetrahedra of light.", visual: "3D: Counter-rotating golden star tetrahedra" },
+    { id: "gen_30", name: "Infinity Singularity Loom", icon: "👑", era: 9, baseCost: 1.0e37, mps: 4.5e28, eps: 3.8e27, amps: 7.5e18, desc: "Writes new realities from absolute eternity.", visual: "3D: Radiant crown halo & hyper-beams" }
+  ];
+
+  // One-time Research Techs (purchased with Energy & Antimatter!)
+  const RESEARCH = [
+    { id: "res_1", name: "Geothermal Turbines", icon: "⚡", era: 0, costE: 40, costA: 0, desc: "Doubles Energy (⚡) production from all sources.", effect: { energyMult: 2 } },
+    { id: "res_2", name: "Deep Mantle Metallurgy", icon: "🔩", era: 0, costE: 260, costA: 0, desc: "1.75x global Matter output.", effect: { matterMult: 1.75 } },
+    { id: "res_3", name: "Solar Sail Logistics", icon: "⛵", era: 1, costE: 6500, costA: 0, desc: "2x global Matter & 1.5x Energy output.", effect: { matterMult: 2, energyMult: 1.5 } },
+    { id: "res_4", name: "Heliospheric Grid", icon: "🔆", era: 1, costE: 85000, costA: 0, desc: "2.5x Energy output & +2% MPS click synergy.", effect: { energyMult: 2.5, extraSynergy: 0.02 } },
+    { id: "res_5", name: "Alcubierre Routing", icon: "🚀", era: 2, costE: 3.2e6, costA: 0, desc: "2.2x global Matter & 2x Energy output.", effect: { matterMult: 2.2, energyMult: 2 } },
+    { id: "res_6", name: "Supergiant Fusion Catalysts", icon: "🌟", era: 2, costE: 5.5e7, costA: 0, desc: "2.5x global Matter output.", effect: { matterMult: 2.5 } },
+    { id: "res_7", name: "Magnetic Positron Traps", icon: "🧲", era: 3, costE: 1.8e9, costA: 120, desc: "2.5x Antimatter (⚛️) synthesis rate.", effect: { antiMult: 2.5 } },
+    { id: "res_8", name: "Ergosphere Harmonics", icon: "🕳️", era: 3, costE: 2.8e10, costA: 1500, desc: "2.5x Matter & 2x Energy output.", effect: { matterMult: 2.5, energyMult: 2 } },
+    { id: "res_9", name: "Intergalactic Relays", icon: "💫", era: 4, costE: 1.5e12, costA: 45000, desc: "3x Matter & 2.5x Antimatter output.", effect: { matterMult: 3, antiMult: 2.5 } },
+    { id: "res_10", name: "Dark Flow Calibration", icon: "🧬", era: 5, costE: 1.8e15, costA: 6e6, desc: "3x Matter, 2.5x Energy & 2.5x Antimatter.", effect: { matterMult: 3, energyMult: 2.5, antiMult: 2.5 } },
+    { id: "res_11", name: "Quasar Beam Focusing", icon: "🌠", era: 6, costE: 2.5e18, costA: 1.2e9, desc: "3.5x Matter & 3x Antimatter output.", effect: { matterMult: 3.5, antiMult: 3 } },
+    { id: "res_12", name: "False Vacuum Tunneling", icon: "⚛️", era: 6, costE: 4.0e20, costA: 8e10, desc: "4x global Matter & +25% Big Crunch DE gain.", effect: { matterMult: 4, deGainMult: 1.25 } },
+    { id: "res_13", name: "Brane Harmonics", icon: "🫧", era: 7, costE: 5.0e22, costA: 4e11, desc: "4x Matter, 3x Energy & 3x Antimatter.", effect: { matterMult: 4, energyMult: 3, antiMult: 3 } },
+    { id: "res_14", name: "4D Metric Engineering", icon: "💠", era: 8, costE: 1.2e27, costA: 2e14, desc: "5x Matter & 4x Antimatter output.", effect: { matterMult: 5, antiMult: 4 } },
+    { id: "res_15", name: "Transcendent Geometry", icon: "👑", era: 9, costE: 5.0e32, costA: 1e17, desc: "8x Matter, Energy & Antimatter output.", effect: { matterMult: 8, energyMult: 8, antiMult: 8 } }
+  ];
+
+  // Permanent Dark Energy Shop Upgrades (persist across Big Crunches!)
+  const DE_SHOP = [
+    { id: "de_drone", name: "Quantum Auto-Harvester", icon: "🤖", baseCost: 2, maxLv: 10, desc: "Automatically clicks the cosmic body (+2 auto-clicks/sec per level)." },
+    { id: "de_energy", name: "Zero-Point Energy Core", icon: "⚡", baseCost: 3, maxLv: 15, desc: "+75% permanent Energy (⚡) & Antimatter (⚛️) rate per level." },
+    { id: "de_discount", name: "Cosmic Mass Compression", icon: "📉", baseCost: 5, maxLv: 8, desc: "Reduces all Generator & Click costs by 6% per level." },
+    { id: "de_starter", name: "Primordial Seed", icon: "🌱", baseCost: 4, maxLv: 10, desc: "Start every Big Crunch with bonus Matter & Energy." },
+    { id: "de_yield", name: "Singularity Resonance", icon: "🌌", baseCost: 8, maxLv: 10, desc: "+35% more Dark Energy earned from every Big Crunch." }
   ];
 
   /* =========================================================================
-     4. GAME STATE, BALANCED MATH & AUTO-SAVE PERSISTENCE
+     4. GAME STATE, 4-CURRENCY BALANCED MATH & AUTO-SAVE PERSISTENCE
   ========================================================================= */
-  const SAVE_KEY = "terra_to_infinity_save_v3";
+  const SAVE_KEY = "terra_to_infinity_save_v4";
 
   function defaultState() {
     const gens = {};
     GENERATORS.forEach(g => gens[g.id] = 0);
     const clicks = {};
     CLICK_UPGRADES.forEach(c => clicks[c.id] = 0);
+    const dePerks = {};
+    DE_SHOP.forEach(d => dePerks[d.id] = 0);
 
     return {
       matter: 0,
+      energy: 0,
+      antimatter: 0,
       runMatterEarned: 0,
       lifetimeMatterEarned: 0,
       era: 0,
       darkEnergy: 0,
+      totalDarkEnergyEarned: 0,
       prestigeCount: 0,
       generators: gens,
       clickUpgrades: clicks,
+      research: {},
+      deShop: dePerks,
       lastSave: Date.now()
     };
   }
@@ -376,12 +416,35 @@
   let state = defaultState();
   let activeTab = "generators";
 
+  function getResearchMults() {
+    let matterMult = 1, energyMult = 1, antiMult = 1, extraSynergy = 0, deGainMult = 1;
+    for (const r of RESEARCH) {
+      if (!state.research[r.id]) continue;
+      if (r.effect.matterMult) matterMult *= r.effect.matterMult;
+      if (r.effect.energyMult) energyMult *= r.effect.energyMult;
+      if (r.effect.antiMult) antiMult *= r.effect.antiMult;
+      if (r.effect.extraSynergy) extraSynergy += r.effect.extraSynergy;
+      if (r.effect.deGainMult) deGainMult *= r.effect.deGainMult;
+    }
+    return { matterMult, energyMult, antiMult, extraSynergy, deGainMult };
+  }
+
+  function getCostDiscount() {
+    const lv = state.deShop.de_discount || 0;
+    return Math.pow(0.94, lv);
+  }
+
   function getGenCost(baseCost, owned) {
-    return Math.floor(baseCost * Math.pow(1.15, owned));
+    return Math.floor(baseCost * Math.pow(1.18, owned) * getCostDiscount());
   }
 
   function getClickCost(baseCost, owned) {
-    return Math.floor(baseCost * Math.pow(1.35, owned));
+    return Math.floor(baseCost * Math.pow(1.42, owned) * getCostDiscount());
+  }
+
+  function getDeShopCost(item) {
+    const lv = state.deShop[item.id] || 0;
+    return Math.floor(item.baseCost * Math.pow(1.85, lv));
   }
 
   function getEraMultiplier() {
@@ -389,25 +452,51 @@
   }
 
   function getDarkEnergyMultiplier() {
-    return 1 + state.darkEnergy * 0.2;
+    return 1 + state.darkEnergy * 0.25; // +25% per unspent Dark Energy
   }
 
-  function getGlobalMultiplier() {
-    return getEraMultiplier() * getDarkEnergyMultiplier();
+  function getGlobalMatterMult() {
+    return getEraMultiplier() * getDarkEnergyMultiplier() * getResearchMults().matterMult;
+  }
+
+  function getGlobalEnergyMult() {
+    const deCore = 1 + (state.deShop.de_energy || 0) * 0.75;
+    return getEraMultiplier() * getDarkEnergyMultiplier() * getResearchMults().energyMult * deCore;
+  }
+
+  function getGlobalAntiMult() {
+    const deCore = 1 + (state.deShop.de_energy || 0) * 0.75;
+    return Math.sqrt(getEraMultiplier()) * (1 + state.darkEnergy * 0.15) * getResearchMults().antiMult * deCore;
   }
 
   function getMps() {
     let base = 0;
     for (const g of GENERATORS) {
-      base += (state.generators[g.id] || 0) * g.baseMps;
+      base += (state.generators[g.id] || 0) * g.mps;
     }
-    return base * getGlobalMultiplier();
+    return base * getGlobalMatterMult();
+  }
+
+  function getEps() {
+    let base = 0;
+    for (const g of GENERATORS) {
+      base += (state.generators[g.id] || 0) * g.eps;
+    }
+    return base * getGlobalEnergyMult();
+  }
+
+  function getAmps() {
+    let base = 0;
+    for (const g of GENERATORS) {
+      if (g.amps > 0) base += (state.generators[g.id] || 0) * g.amps;
+    }
+    return base * getGlobalAntiMult();
   }
 
   function getMpc() {
     let baseFlat = 1;
     let addMult = 1;
-    let totalMpsPct = 0;
+    let totalMpsPct = getResearchMults().extraSynergy;
 
     for (const c of CLICK_UPGRADES) {
       const owned = state.clickUpgrades[c.id] || 0;
@@ -418,13 +507,19 @@
       }
     }
 
-    const cappedSynergy = Math.min(0.25, totalMpsPct);
-    return (baseFlat * addMult * getGlobalMultiplier()) + (getMps() * cappedSynergy);
+    const cappedSynergy = Math.min(0.08, totalMpsPct); // Hard-capped at 8% MPS per click
+    return (baseFlat * addMult * getGlobalMatterMult()) + (getMps() * cappedSynergy);
+  }
+
+  function getEpc() {
+    return (0.15 + getEps() * 0.025) * (1 + (state.deShop.de_energy || 0) * 0.25);
   }
 
   function calculatePendingDarkEnergy() {
-    if (state.era < 5 || state.runMatterEarned < 1e14) return 0;
-    return Math.floor(Math.pow(state.runMatterEarned / 1e14, 0.36));
+    // Unlocks at Era VII: Observable Universe once Run Matter >= 1e19
+    if (state.era < 6 || state.runMatterEarned < 1e19) return 0;
+    const yieldBonus = (1 + (state.deShop.de_yield || 0) * 0.35) * getResearchMults().deGainMult;
+    return Math.floor(Math.pow(state.runMatterEarned / 1e19, 0.30) * 3 * yieldBonus);
   }
 
   function saveGame(showMsg = false, isAuto = false) {
@@ -448,29 +543,38 @@
       if (!raw) return;
       const parsed = JSON.parse(raw);
       const fresh = defaultState();
-      const safeNum = (v, fallback = 0) => (Number.isFinite(v) && v >= 0 ? v : fallback);
+      const safeNum = (v, fb = 0) => (Number.isFinite(v) && v >= 0 ? v : fb);
 
       state = {
         ...fresh,
         matter: safeNum(parsed.matter),
+        energy: safeNum(parsed.energy),
+        antimatter: safeNum(parsed.antimatter),
         runMatterEarned: safeNum(parsed.runMatterEarned),
         lifetimeMatterEarned: safeNum(parsed.lifetimeMatterEarned),
         era: clamp(Math.floor(safeNum(parsed.era)), 0, ERAS.length - 1),
         darkEnergy: Math.floor(safeNum(parsed.darkEnergy)),
+        totalDarkEnergyEarned: Math.floor(safeNum(parsed.totalDarkEnergyEarned)),
         prestigeCount: Math.floor(safeNum(parsed.prestigeCount)),
         generators: { ...fresh.generators, ...(parsed.generators || {}) },
         clickUpgrades: { ...fresh.clickUpgrades, ...(parsed.clickUpgrades || {}) },
+        research: { ...(parsed.research || {}) },
+        deShop: { ...fresh.deShop, ...(parsed.deShop || {}) },
         lastSave: safeNum(parsed.lastSave, Date.now())
       };
 
       const elapsedSec = Math.min(14400, Math.max(0, (Date.now() - state.lastSave) / 1000));
       const mps = getMps();
       if (elapsedSec > 5 && mps > 0) {
-        const offlineGain = mps * elapsedSec * 0.5;
-        state.matter += offlineGain;
-        state.runMatterEarned += offlineGain;
-        state.lifetimeMatterEarned += offlineGain;
-        setTimeout(() => showToast(`Welcome back! +${formatNum(offlineGain)} offline Matter`), 400);
+        const offlineM = mps * elapsedSec * 0.45;
+        const offlineE = getEps() * elapsedSec * 0.45;
+        const offlineA = getAmps() * elapsedSec * 0.45;
+        state.matter += offlineM;
+        state.energy += offlineE;
+        state.antimatter += offlineA;
+        state.runMatterEarned += offlineM;
+        state.lifetimeMatterEarned += offlineM;
+        setTimeout(() => showToast(`Welcome back! +${formatNum(offlineM)} Matter, +${formatNum(offlineE)} Energy`), 400);
       }
     } catch (e) {
       console.warn("Load failed:", e);
@@ -478,7 +582,7 @@
   }
 
   function hardReset() {
-    if (!confirm("Permanently wipe ALL progress, including Dark Energy?")) return;
+    if (!confirm("Permanently wipe ALL progress, Research, Antimatter, and Dark Energy?")) return;
     localStorage.removeItem(SAVE_KEY);
     state = defaultState();
     cosmos3D.setEra(0, true);
@@ -503,15 +607,15 @@
   });
 
   /* =========================================================================
-     5. ULTRA-HD WEBGL GPU PLANET ENGINE
-        - Pre-bakes 1024x512 seamless 3D Earth Terrain/City & Swirling Cloud
-          maps directly on the GPU in ~15ms for locked 60-120 FPS performance.
-        - Renders 768px supersampled spheres with 3D bump-mapped mountains,
-          cloud shadows, Rayleigh scattering, aurora borealis & Earthshine.
+     5. ULTRA-HD WEBGL GPU PLANET ENGINE (ZERO-TERRACING 2K EARTH + ALL 8 PLANETS)
+        - Bakes 2048x1024 Earth macro maps on GPU + layers live 3D Simplex
+          micro-detail so mountains, coastlines, clouds & night cities have
+          zero pixelation or 8-bit contour banding!
+        - Includes Neptune (type 9) so all 8 planets of the Solar System render.
   ========================================================================= */
   const PLANET_TYPE = {
     earth: 0, moon: 1, sun: 2, jupiter: 3,
-    saturn: 4, mars: 5, venus: 6, mercury: 7, uranus: 8
+    saturn: 4, mars: 5, venus: 6, mercury: 7, uranus: 8, neptune: 9
   };
 
   class GPUPlanetRenderer {
@@ -655,7 +759,7 @@
         }
       `;
 
-      // Startup GPU Texture Baker (renders seamless 1024x512 HD maps in ~15ms)
+      // GPU 2K Texture Baker (packs smooth elevation, moisture, city webs & fault veins)
       const bakeFsSource = `
         precision highp float;
         varying vec2 vUv;
@@ -668,39 +772,33 @@
           vec3 P = vec3(cos(lat) * cos(lon), sin(lat), cos(lat) * sin(lon));
 
           if (uMode < 0.5) {
-            // Mode 0: Earth Surface (R=Elevation, G=Moisture, B=CityWeb, A=MagmaFissures)
             vec3 warp = vec3(
-              snoise(P * 1.35 + vec3(2.1, 0.4, 3.3)),
-              snoise(P * 1.35 + vec3(5.7, 2.9, 1.2)),
-              snoise(P * 1.35 + vec3(8.3, 4.1, 6.4))
-            ) * 0.34;
-            float continents = fbm6((P + warp) * 1.58 + vec3(1.6, 0.8, 2.3));
-            float mountains = ridgedFbm(P * 4.8 + vec3(3.1, 1.5, 4.9));
-            float fineCoast = fbm4(P * 14.0) * 0.045;
-            float elev = clamp(continents * 0.82 + mountains * 0.21 + fineCoast - 0.02, 0.0, 1.0);
+              snoise(P * 1.32 + vec3(2.1, 0.4, 3.3)),
+              snoise(P * 1.32 + vec3(5.7, 2.9, 1.2)),
+              snoise(P * 1.32 + vec3(8.3, 4.1, 6.4))
+            ) * 0.35;
+            float continents = fbm6((P + warp) * 1.55 + vec3(1.6, 0.8, 2.3));
+            float mountains = ridgedFbm(P * 4.6 + vec3(3.1, 1.5, 4.9));
+            float elev = clamp(continents * 0.82 + mountains * 0.21 - 0.02, 0.0, 1.0);
 
-            float moisture = clamp(fbm6(P * 2.6 + vec3(6.2, 1.4, 3.8)), 0.0, 1.0);
+            float moisture = clamp(fbm6(P * 2.5 + vec3(6.2, 1.4, 3.8)), 0.0, 1.0);
 
-            // Metropolitan city hubs + spiderweb road networks along coastlines
             float metro = fbm4(P * 7.8 + vec3(3.3, 1.1, 7.2));
             float roads = pow(1.0 - abs(snoise(P * 24.0 + vec3(1.4, 5.2, 2.8))), 4.0);
             float lights = smoothstep(0.54, 0.78, metro) * (0.45 + 0.55 * roads);
 
-            // Volcanic tectonic fault veins
             float fault = pow(smoothstep(0.84, 0.99, 1.0 - abs(snoise(P * 10.5 + vec3(2.4, 5.1, 1.7)))), 2.2);
 
             gl_FragColor = vec4(elev, moisture, clamp(lights, 0.0, 1.0), clamp(fault, 0.0, 1.0));
           } else {
-            // Mode 1: Earth Swirling Cloud Deck with Cyclone/Hurricane Vortices
-            vec3 q = P * 2.25;
-            // Create swirling weather vortex domain warp
+            vec3 q = P * 2.2;
             vec3 swirl = vec3(
               fbm4(q + vec3(1.7, 9.2, 3.1)),
               fbm4(q + vec3(8.3, 2.8, 5.4)),
               fbm4(q + vec3(4.1, 6.5, 1.9))
             );
-            float mainClouds = fbm6(q + (swirl - 0.5) * 1.45);
-            float wisps = fbm4(P * 7.5 + swirl * 1.2);
+            float mainClouds = fbm6(q + (swirl - 0.5) * 1.48);
+            float wisps = fbm4(P * 7.8 + swirl * 1.2);
             float density = smoothstep(0.47, 0.76, mainClouds * 0.78 + wisps * 0.28);
             float thick = smoothstep(0.58, 0.85, mainClouds);
             gl_FragColor = vec4(density, wisps, thick, 1.0);
@@ -708,7 +806,6 @@
         }
       `;
 
-      // Real-Time HD Display Shader
       const displayFsSource = `
         precision highp float;
         varying vec2 vUv;
@@ -753,12 +850,11 @@
           uv.y = -uv.y;
           float r2 = dot(uv, uv);
 
-          // Crisp Outer Atmospheric Halo outside sphere limb
           if (r2 >= 1.0) {
             float dist = sqrt(r2);
             if (uType < 0.5) {
-              float halo = exp(-(dist - 1.0) * 26.0) * 0.58;
-              gl_FragColor = vec4(vec3(0.24, 0.68, 1.0) * halo, halo);
+              float halo = exp(-(dist - 1.0) * 26.0) * 0.6;
+              gl_FragColor = vec4(vec3(0.22, 0.68, 1.0) * halo, halo);
               return;
             } else if (uType > 1.5 && uType < 2.5) {
               float halo = exp(-(dist - 1.0) * 20.0) * 0.85;
@@ -786,73 +882,59 @@
           float ndotl = dot(N, L);
           vec3 col = vec3(0.0);
 
-          // ==================== 0: ULTRA-HD EARTH ====================
+          // ==================== 0: ULTRA-HD ZERO-TERRACING EARTH ====================
           if (uType < 0.5) {
             vec2 eUV = sphereUV(P);
             vec4 data = texture2D(uEarthTex, eUV);
-            float elev = data.r;
+            // Layer crisp analytical 3D Simplex micro-detail over 2K baked continents (zero 8-bit banding!)
+            float microDetail = snoise(P * 18.0) * 0.018 + snoise(P * 42.0) * 0.008;
+            float elev = data.r + microDetail;
             float moisture = data.g;
             float cityMap = data.b;
             float faultMap = data.a;
 
-            float seaLevel = 0.555;
+            float seaLevel = 0.552;
             float lat = abs(P.y);
-            float polarIce = lat + (moisture - 0.5) * 0.16;
+            float polarIce = lat + (moisture - 0.5) * 0.14 + microDetail * 1.4;
+            float landMask = smoothstep(seaLevel - 0.006, seaLevel + 0.006, elev);
+            float iceMask = smoothstep(0.842, 0.872, polarIce);
 
-            // High-Resolution Tangent-Space Bump Mapping for Mountain Ranges
+            // Smooth analytical mountain bump normal (zero contour terracing!)
             vec3 bumpN = N;
-            if (elev >= seaLevel && polarIce <= 0.85) {
-              float du = 1.0 / 1024.0;
-              float dv = 1.0 / 512.0;
-              float hL = texture2D(uEarthTex, eUV - vec2(du, 0.0)).r;
-              float hR = texture2D(uEarthTex, eUV + vec2(du, 0.0)).r;
-              float hD = texture2D(uEarthTex, eUV - vec2(0.0, dv)).r;
-              float hU = texture2D(uEarthTex, eUV + vec2(0.0, dv)).r;
-
-              float horiz = length(vec2(-P.z, P.x));
-              if (horiz > 0.02) {
-                vec3 eastObj = vec3(-P.z / horiz, 0.0, P.x / horiz);
-                vec3 northObj = normalize(cross(eastObj, P));
-                vec3 T = rotYVec(eastObj, -uSpin);
-                vec3 B = rotYVec(northObj, -uSpin);
-                float relief = smoothstep(seaLevel, seaLevel + 0.18, elev) * 16.0;
-                bumpN = normalize(N - T * (hR - hL) * relief - B * (hU - hD) * relief);
-              }
+            float mountainFactor = smoothstep(seaLevel + 0.02, seaLevel + 0.24, elev) * (1.0 - iceMask);
+            if (mountainFactor > 0.01) {
+              float eps = 0.01;
+              vec3 tx = normalize(cross(abs(N.y) < 0.9 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0), N));
+              vec3 ty = cross(N, tx);
+              vec3 Px = rotYVec(normalize(N + tx * eps), uSpin);
+              vec3 Py = rotYVec(normalize(N + ty * eps), uSpin);
+              float dX = (snoise(Px * 14.0) - snoise(P * 14.0)) * 0.55 + (snoise(Px * 32.0) - snoise(P * 32.0)) * 0.28;
+              float dY = (snoise(Py * 14.0) - snoise(P * 14.0)) * 0.55 + (snoise(Py * 32.0) - snoise(P * 32.0)) * 0.28;
+              bumpN = normalize(N - tx * dX * mountainFactor * 4.5 - ty * dY * mountainFactor * 4.5);
             }
 
             float diff = max(0.0, dot(bumpN, L));
             float smoothDiff = smoothstep(-0.14, 0.25, ndotl);
-            float specStrength = 0.0;
-            vec3 surfCol;
 
-            if (polarIce > 0.855) {
-              surfCol = mix(vec3(0.84, 0.91, 0.98), vec3(0.97, 0.99, 1.0), moisture);
-              specStrength = 0.26;
-            } else if (elev < seaLevel) {
-              float depth = clamp((seaLevel - elev) / 0.24, 0.0, 1.0);
-              vec3 deepSea = vec3(0.012, 0.068, 0.22);
-              vec3 midSea  = vec3(0.032, 0.23, 0.48);
-              vec3 coast   = vec3(0.075, 0.56, 0.72);
-              surfCol = mix(coast, midSea, smoothstep(0.0, 0.16, depth));
-              surfCol = mix(surfCol, deepSea, smoothstep(0.15, 0.82, depth));
-              specStrength = 1.0;
-            } else {
-              float h = clamp((elev - seaLevel) / 0.30, 0.0, 1.0);
-              vec3 beach   = vec3(0.76, 0.70, 0.52);
-              vec3 rainfor = vec3(0.06, 0.29, 0.13);
-              vec3 forest  = vec3(0.16, 0.42, 0.18);
-              vec3 desert  = vec3(0.76, 0.62, 0.38);
-              vec3 rock    = vec3(0.41, 0.37, 0.34);
-              vec3 snow    = vec3(0.95, 0.97, 1.0);
+            // Ocean Bathymetry
+            float depth = clamp((seaLevel - elev) / 0.24, 0.0, 1.0);
+            vec3 oceanCol = mix(vec3(0.07, 0.58, 0.74), vec3(0.03, 0.24, 0.50), smoothstep(0.0, 0.15, depth));
+            oceanCol = mix(oceanCol, vec3(0.012, 0.068, 0.22), smoothstep(0.14, 0.82, depth));
 
-              float arid = smoothstep(0.40, 0.72, moisture) * smoothstep(0.56, 0.10, abs(lat - 0.31));
-              vec3 lowland = mix(mix(rainfor, forest, moisture), desert, arid * 0.88);
-              surfCol = mix(beach, lowland, smoothstep(0.0, 0.04, h));
-              surfCol = mix(surfCol, rock, smoothstep(0.46, 0.76, h));
-              surfCol = mix(surfCol, snow, smoothstep(0.74, 0.90, h));
-            }
+            // Multi-Biome Continents
+            float h = clamp((elev - seaLevel) / 0.30, 0.0, 1.0);
+            float arid = smoothstep(0.40, 0.72, moisture) * smoothstep(0.56, 0.10, abs(lat - 0.31));
+            vec3 lowland = mix(mix(vec3(0.055, 0.28, 0.125), vec3(0.16, 0.43, 0.18), moisture), vec3(0.76, 0.62, 0.38), arid * 0.86);
+            vec3 landCol = mix(vec3(0.76, 0.70, 0.52), lowland, smoothstep(0.0, 0.035, h));
+            landCol = mix(landCol, vec3(0.42, 0.38, 0.35), smoothstep(0.44, 0.74, h));
+            landCol = mix(landCol, vec3(0.95, 0.97, 1.0), smoothstep(0.72, 0.88, h));
 
-            // Independently Drifting Swirling Cloud Layer + Soft Projected Shadows
+            // Smooth Polar Ice Cap Blending
+            vec3 iceCol = mix(vec3(0.84, 0.91, 0.98), vec3(0.97, 0.99, 1.0), moisture);
+            vec3 surfCol = mix(mix(oceanCol, landCol, landMask), iceCol, iceMask);
+            float specStrength = mix(1.0, 0.0, landMask) * (1.0 - iceMask) + iceMask * 0.25;
+
+            // Drifting Swirling Cloud Layer + Soft Projected Shadows
             vec3 Pcloud = rotYVec(N, uSpin * 1.22 + uTime * 0.022);
             vec4 cData = texture2D(uCloudTex, sphereUV(Pcloud));
             float cloudMask = cData.r;
@@ -862,37 +944,36 @@
             float shadowVal = texture2D(uCloudTex, sphereUV(Pshadow)).r;
             float cloudShadow = 1.0 - shadowVal * 0.48 * max(0.0, ndotl);
 
-            // Crisp Ocean Sun Glint
-            float spec = pow(max(0.0, dot(N, H)), 44.0) * specStrength * (1.0 - cloudMask * 0.88) * smoothDiff;
+            float spec = pow(max(0.0, dot(N, H)), 46.0) * specStrength * (1.0 - cloudMask * 0.88) * smoothDiff;
 
-            vec3 litSurface = surfCol * (0.045 + diff * 1.12 * cloudShadow) + vec3(0.88, 0.95, 1.0) * spec * 0.82;
-            vec3 cloudCol = mix(vec3(0.94, 0.97, 1.0), vec3(0.82, 0.87, 0.94), cloudThick * 0.5) * (0.055 + max(0.0, ndotl) * 1.05);
+            vec3 litSurface = surfCol * (0.045 + diff * 1.12 * cloudShadow) + vec3(0.88, 0.95, 1.0) * spec * 0.85;
+            vec3 cloudCol = mix(vec3(0.95, 0.98, 1.0), vec3(0.82, 0.87, 0.94), cloudThick * 0.48) * (0.055 + max(0.0, ndotl) * 1.06);
             col = mix(litSurface, cloudCol, cloudMask * 0.9);
 
-            // Golden-Crimson Sunset Terminator Scattering
+            // Sunset Terminator Scattering
             float sunset = exp(-pow((ndotl - 0.01) * 5.6, 2.0)) * (1.0 - cloudMask * 0.25);
             col += vec3(0.58, 0.20, 0.06) * sunset * 0.46;
 
-            // Night-Side Aurora Borealis Ribbons near Magnetic Poles
+            // Night-Side Aurora Borealis
             float nightMask = smoothstep(0.08, -0.22, ndotl);
             float auroraBand = exp(-pow((lat - 0.82) * 14.0, 2.0));
             float auroraWave = smoothstep(0.25, 0.85, snoise(vec3(P.x * 6.0 + uTime * 0.25, P.y * 4.0, P.z * 6.0 - uTime * 0.2)) * 0.5 + 0.5);
-            col += mix(vec3(0.12, 0.95, 0.55), vec3(0.2, 0.65, 1.0), auroraWave) * auroraBand * auroraWave * nightMask * 0.32;
+            col += mix(vec3(0.12, 0.95, 0.55), vec3(0.2, 0.65, 1.0), auroraWave) * auroraBand * auroraWave * nightMask * 0.34;
 
-            // Ultra-Crisp Night-Side Megacity Grids (Core Extractors & Lunar Colonies)
-            if (uCityBoost > 0.0 && elev >= seaLevel && elev < seaLevel + 0.17 && polarIce < 0.78 && nightMask > 0.0) {
-              float microSpark = smoothstep(0.35, 0.82, snoise(P * 52.0) * 0.5 + 0.5);
+            // Crisp Night-Side Megacities
+            if (uCityBoost > 0.0 && landMask > 0.5 && h < 0.52 && iceMask < 0.2 && nightMask > 0.0) {
+              float microSpark = smoothstep(0.35, 0.82, snoise(P * 54.0) * 0.5 + 0.5);
               float twinkle = 0.88 + 0.12 * sin(uTime * 3.2 + P.x * 45.0);
               col += vec3(1.0, 0.78, 0.36) * cityMap * (0.45 + 0.75 * microSpark) * nightMask * (1.0 - cloudMask * 0.65) * uCityBoost * twinkle * 1.9;
             }
 
-            // Glowing Crustal Magma Fissures (Tectonic Drills)
-            if (uMagmaBoost > 0.0 && elev >= seaLevel + 0.04 && polarIce < 0.82) {
+            // Tectonic Magma Fissures
+            if (uMagmaBoost > 0.0 && landMask > 0.6 && iceMask < 0.2) {
               float pulse = 0.84 + 0.16 * sin(uTime * 4.5 + P.y * 12.0);
               col += vec3(1.0, 0.34, 0.04) * faultMap * (1.0 - cloudMask * 0.5) * uMagmaBoost * pulse * 2.1;
             }
 
-            // Atmospheric Rayleigh Blue Rim Scattering
+            // Rayleigh Blue Atmospheric Fresnel Rim
             float fresnel = pow(max(0.0, 1.0 + vz), 3.0);
             col += vec3(0.22, 0.66, 1.0) * fresnel * (0.28 + max(0.0, ndotl + 0.22) * 0.98);
           }
@@ -912,8 +993,7 @@
             regolith *= 0.82 + h * 0.34;
 
             float diff = max(0.0, dot(bumpN, L));
-            // Subtle blue Earthshine on unlit side so Moon is always clearly sculpted
-            vec3 earthshine = vec3(0.14, 0.20, 0.30) * (0.55 + 0.45 * max(0.0, -vz));
+            vec3 earthshine = vec3(0.15, 0.21, 0.32) * (0.55 + 0.45 * max(0.0, -vz));
             col = regolith * (earthshine + vec3(1.04, 1.02, 0.98) * diff);
 
             if (uExtraBoost > 0.0) {
@@ -948,16 +1028,16 @@
           // ==================== 4: SATURN ====================
           else if (uType < 4.5) {
             float swirl = fbm4(vec3(P.x * 2.4, P.y * 7.5, P.z * 2.4));
-            float band = sin(P.y * 18.0 + (swirl - 0.5) * 1.6) * 0.5 + 0.5;
-            vec3 surf = mix(vec3(0.75, 0.65, 0.44), vec3(0.94, 0.86, 0.64), band);
-            col = surf * (0.15 + max(0.0, ndotl) * 0.92);
+            float band = sin(P.y * 18.0 + (swirl - 0.5) * 1.4) * 0.5 + 0.5;
+            vec3 surf = mix(vec3(0.76, 0.66, 0.46), vec3(0.95, 0.88, 0.68), band);
+            col = surf * (0.16 + max(0.0, ndotl) * 0.92);
           }
 
           // ==================== 5: MARS ====================
           else if (uType < 5.5) {
             float n = fbm4(P * 3.4 + vec3(2.1, 4.3, 1.5));
             vec3 surf = mix(vec3(0.45, 0.18, 0.10), vec3(0.84, 0.40, 0.22), n);
-            if (abs(P.y) > 0.88) surf = vec3(0.94, 0.91, 0.89);
+            surf = mix(surf, vec3(0.94, 0.91, 0.89), smoothstep(0.86, 0.91, abs(P.y)));
             float fresnel = pow(max(0.0, 1.0 + vz), 3.2);
             col = surf * (0.12 + max(0.0, ndotl) * 0.95) + vec3(0.85, 0.45, 0.25) * fresnel * 0.35;
           }
@@ -977,11 +1057,25 @@
           }
 
           // ==================== 8: URANUS ====================
-          else {
+          else if (uType < 8.5) {
             float band = fbm4(vec3(P.x * 2.0, P.y * 5.5, P.z * 2.0));
-            vec3 surf = mix(vec3(0.38, 0.76, 0.86), vec3(0.64, 0.91, 0.96), band);
+            vec3 surf = mix(vec3(0.44, 0.82, 0.88), vec3(0.70, 0.94, 0.98), band);
             float fresnel = pow(max(0.0, 1.0 + vz), 3.0);
-            col = surf * (0.18 + max(0.0, ndotl) * 0.88) + vec3(0.55, 0.92, 1.0) * fresnel * 0.4;
+            col = surf * (0.18 + max(0.0, ndotl) * 0.88) + vec3(0.58, 0.94, 1.0) * fresnel * 0.42;
+          }
+
+          // ==================== 9: NEPTUNE (DEEP AZURE ICE GIANT) ====================
+          else {
+            float swirl = fbm4(vec3(P.x * 3.0, P.y * 8.0, P.z * 3.0));
+            float band = sin(P.y * 16.0 + (swirl - 0.5) * 2.2) * 0.5 + 0.5;
+            vec3 surf = mix(vec3(0.08, 0.22, 0.68), vec3(0.18, 0.44, 0.92), band);
+            // Great Dark Spot & high-altitude white methane streaks
+            float darkSpot = length(vec3((P.x + 0.65) * 1.6, (P.y + 0.22) * 3.4, (P.z - 0.60) * 1.6));
+            surf = mix(vec3(0.04, 0.11, 0.42), surf, smoothstep(0.14, 0.30, darkSpot));
+            float streaks = smoothstep(0.74, 0.88, fbm4(vec3(P.x * 4.0, P.y * 16.0, P.z * 4.0)));
+            surf = mix(surf, vec3(0.75, 0.90, 1.0), streaks * 0.55);
+            float fresnel = pow(max(0.0, 1.0 + vz), 2.8);
+            col = surf * (0.16 + max(0.0, ndotl) * 0.92) + vec3(0.24, 0.56, 1.0) * fresnel * 0.5;
           }
 
           gl_FragColor = vec4(col * edgeAA, edgeAA);
@@ -996,7 +1090,10 @@
       gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
 
-      // Bake 1024x512 HD Earth Surface & Swirling Cloud textures on GPU
+      const maxTex = gl.getParameter(gl.MAX_TEXTURE_SIZE) || 1024;
+      const bakeW = maxTex >= 2048 ? 2048 : 1024;
+      const bakeH = bakeW / 2;
+
       const bakeTexture = (w, h, mode) => {
         const tex = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -1025,11 +1122,10 @@
         return tex;
       };
 
-      this.earthTex = bakeTexture(1024, 512, 0.0);
-      this.cloudTex = bakeTexture(1024, 512, 1.0);
+      this.earthTex = bakeTexture(bakeW, bakeH, 0.0);
+      this.cloudTex = bakeTexture(bakeW, bakeH, 1.0);
       gl.deleteProgram(bakeProg);
 
-      // Configure main display program
       this.program = dispProg;
       gl.useProgram(dispProg);
       const posLoc = gl.getAttribLocation(dispProg, "aPos");
@@ -1127,7 +1223,7 @@
   }
 
   /* =========================================================================
-     7. FULL 7-ERA 3D COSMOS ENGINE (CLIP-SAFE & UPGRADE-REACTIVE)
+     7. FULL 10-ERA 3D COSMOS ENGINE
   ========================================================================= */
   class Cosmos3DEngine {
     constructor(canvas) {
@@ -1137,15 +1233,13 @@
       this.height = 0;
       this.fov = 560;
 
-      // Smooth camera with inertia & zoom
-      this.rotX = 0.26;
+      this.rotX = 0.28;
       this.rotY = -0.35;
       this.velX = 0;
       this.velY = 0;
       this.zoom = 1.0;
       this.targetZoom = 1.0;
 
-      // Visual animation states
       this.pulse = 0;
       this.eraTransition = 0;
       this.currentEra = 0;
@@ -1154,10 +1248,8 @@
       this.burstParticles = [];
       this.shockwaves = [];
 
-      // Ultra-HD GPU WebGL Planet Renderer (768px supersampled)
       this.gpuPlanets = new GPUPlanetRenderer(768);
 
-      // Glow Sprite Cache
       this.glows = {
         blue: createGlowSprite("rgba(186, 230, 253, 0.95)", "rgba(56, 189, 248, 0.36)"),
         gold: createGlowSprite("rgba(254, 249, 195, 0.96)", "rgba(251, 146, 60, 0.42)"),
@@ -1205,25 +1297,26 @@
         });
       }
 
-      // Era 1: Solar System Planets & Asteroids
+      // Era 1: ALL 8 Solar System Planets (Mercury through Neptune)
       this.solarPlanets = [
-        { key: "mercury", dist: 78, radius: 5.5, speed: 0.55, angle: 0.4, tilt: 0.08 },
-        { key: "venus", dist: 106, radius: 8.5, speed: 0.42, angle: 2.1, tilt: 0.05 },
-        { key: "earth", dist: 140, radius: 10.2, speed: 0.32, angle: 3.7, tilt: 0.02 },
-        { key: "mars", dist: 174, radius: 7.6, speed: 0.25, angle: 5.1, tilt: 0.06 },
-        { key: "jupiter", dist: 232, radius: 19.5, speed: 0.15, angle: 1.2, tilt: 0.04, gasGiant: true },
-        { key: "saturn", dist: 295, radius: 16.5, speed: 0.11, angle: 4.3, tilt: 0.09, gasGiant: true, ring: true },
-        { key: "uranus", dist: 348, radius: 12.2, speed: 0.08, angle: 2.7, tilt: 0.07 }
+        { key: "mercury", dist: 70, radius: 5.0, speed: 0.56, angle: 0.4, tilt: 0.12 },
+        { key: "venus", dist: 94, radius: 8.2, speed: 0.42, angle: 2.0, tilt: 0.06 },
+        { key: "earth", dist: 122, radius: 9.4, speed: 0.33, angle: 3.6, tilt: 0.02 },
+        { key: "mars", dist: 150, radius: 7.0, speed: 0.26, angle: 5.1, tilt: 0.05 },
+        { key: "jupiter", dist: 204, radius: 18.2, speed: 0.16, angle: 1.1, tilt: 0.04, gasGiant: true },
+        { key: "saturn", dist: 268, radius: 15.6, speed: 0.115, angle: 4.15, tilt: 0.07, gasGiant: true, saturnRing: true },
+        { key: "uranus", dist: 326, radius: 11.4, speed: 0.082, angle: 2.5, tilt: 0.05, gasGiant: true, uranusRing: true },
+        { key: "neptune", dist: 376, radius: 11.2, speed: 0.062, angle: 5.65, tilt: 0.06, gasGiant: true }
       ];
 
       this.asteroids = [];
-      for (let i = 0; i < 105; i++) {
+      for (let i = 0; i < 110; i++) {
         this.asteroids.push({
-          dist: 194 + (Math.random() - 0.5) * 26,
+          dist: 174 + (Math.random() - 0.5) * 22,
           angle: Math.random() * Math.PI * 2,
           y: (Math.random() - 0.5) * 14,
           speed: 0.18 + Math.random() * 0.08,
-          size: 2.2 + Math.random() * 3.2
+          size: 2.0 + Math.random() * 3.0
         });
       }
 
@@ -1245,8 +1338,7 @@
           x: r * Math.sin(ph) * Math.cos(th),
           y: r * Math.sin(ph) * Math.sin(th) * 0.72,
           z: r * Math.cos(ph),
-          glow: st.glow,
-          core: st.core,
+          glow: st.glow, core: st.core,
           radius: i === 0 ? 22 : st.size * (0.75 + Math.random() * 0.5),
           phase: Math.random() * Math.PI * 2
         });
@@ -1265,7 +1357,7 @@
 
       // Era 3: Milky Way
       this.galaxyStars = [];
-      for (let i = 0; i < 1250; i++) {
+      for (let i = 0; i < 1200; i++) {
         const arm = i % 4;
         const t = Math.pow(Math.random(), 0.85);
         const dist = 20 + t * 255;
@@ -1307,7 +1399,51 @@
         });
       }
 
-      // Era 4: Laniakea Supercluster
+      // Era 4: Local Group (Milky Way + Andromeda Merging Spirals + Dwarf Satellites)
+      this.localGroupA = [];
+      this.localGroupB = [];
+      for (let i = 0; i < 460; i++) {
+        const arm = i % 2;
+        const t = Math.pow(Math.random(), 0.8);
+        const dist = 10 + t * 125;
+        const a = arm * Math.PI + dist * 0.038 + (Math.random() - 0.5) * 0.45;
+        this.localGroupA.push({
+          x: Math.cos(a) * dist,
+          y: (Math.random() - 0.5) * 12 * (1 - t * 0.6),
+          z: Math.sin(a) * dist,
+          size: t < 0.2 ? 2.1 : 1.1 + Math.random(),
+          color: t < 0.2 ? "#fef08a" : "#93c5fd"
+        });
+      }
+      for (let i = 0; i < 540; i++) {
+        const arm = i % 2;
+        const t = Math.pow(Math.random(), 0.8);
+        const dist = 12 + t * 145;
+        const a = arm * Math.PI + dist * 0.034 + (Math.random() - 0.5) * 0.45;
+        const lx = Math.cos(a) * dist;
+        const ly = (Math.random() - 0.5) * 14 * (1 - t * 0.6);
+        const lz = Math.sin(a) * dist;
+        const tilt = 0.68;
+        this.localGroupB.push({
+          x: lx,
+          y: ly * Math.cos(tilt) - lz * Math.sin(tilt),
+          z: lz * Math.cos(tilt) + ly * Math.sin(tilt),
+          size: t < 0.2 ? 2.2 : 1.1 + Math.random(),
+          color: t < 0.2 ? "#fde68a" : "#e9d5ff"
+        });
+      }
+      this.dwarfGalaxies = [];
+      for (let i = 0; i < 14; i++) {
+        this.dwarfGalaxies.push({
+          r: 175 + (i % 3) * 32,
+          angle: (i / 14) * Math.PI * 2,
+          y: (Math.random() - 0.5) * 125,
+          speed: 0.14 + (i % 4) * 0.04,
+          size: 8 + (i % 3) * 4
+        });
+      }
+
+      // Era 5: Laniakea Supercluster
       this.superGalaxies = [];
       for (let i = 0; i < 46; i++) {
         const stream = i % 5;
@@ -1325,7 +1461,7 @@
         });
       }
 
-      // Era 5: Observable Universe
+      // Era 6: Observable Universe
       this.webNodes = [];
       this.webEdges = [];
       for (let i = 0; i < 100; i++) {
@@ -1352,23 +1488,30 @@
         }
       }
 
-      // Era 6: The Omniverse
+      // Era 7: The Multiverse
+      this.foamDots = [];
+      for (let i = 0; i < 140; i++) {
+        this.foamDots.push({
+          x: (Math.random() - 0.5) * 340,
+          y: (Math.random() - 0.5) * 220,
+          z: (Math.random() - 0.5) * 340,
+          phase: Math.random() * Math.PI * 2,
+          color: i % 3 === 0 ? "#38bdf8" : (i % 3 === 1 ? "#c084fc" : "#f472b6")
+        });
+      }
+
+      // Era 8: The Omniverse
       this.tesseractVerts = [];
       for (let i = 0; i < 16; i++) {
         this.tesseractVerts.push([
-          (i & 1) ? 1 : -1,
-          (i & 2) ? 1 : -1,
-          (i & 4) ? 1 : -1,
-          (i & 8) ? 1 : -1
+          (i & 1) ? 1 : -1, (i & 2) ? 1 : -1, (i & 4) ? 1 : -1, (i & 8) ? 1 : -1
         ]);
       }
       this.tesseractEdges = [];
       for (let i = 0; i < 16; i++) {
         for (let j = i + 1; j < 16; j++) {
           const diff = i ^ j;
-          if (diff === 1 || diff === 2 || diff === 4 || diff === 8) {
-            this.tesseractEdges.push([i, j]);
-          }
+          if (diff === 1 || diff === 2 || diff === 4 || diff === 8) this.tesseractEdges.push([i, j]);
         }
       }
 
@@ -1383,18 +1526,19 @@
       for (let i = 0; i < 24; i++) {
         const th = (i / 24) * Math.PI * 2;
         const ph = Math.acos(2 * ((i * 0.6180339) % 1) - 1);
-        const r = 135 + (i % 3) * 42;
         const col = bColors[i % bColors.length];
         this.bubbleUniverses.push({
-          orbitR: r,
-          theta: th,
-          phi: ph,
+          orbitR: 135 + (i % 3) * 42, theta: th, phi: ph,
           speed: 0.14 + (i % 4) * 0.05,
           radius: 16 + (i % 5) * 4.5,
-          fill: col[0],
-          stroke: col[1]
+          fill: col[0], stroke: col[1]
         });
       }
+
+      // Era 9: The Architect's Void (Sacred Merkaba Star Tetrahedron)
+      this.tetraA = [[1, 1, 1], [1, -1, -1], [-1, 1, -1], [-1, -1, 1]];
+      this.tetraB = [[-1, -1, -1], [-1, 1, 1], [1, -1, 1], [1, 1, -1]];
+      this.tetraEdges = [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]];
     }
 
     setEra(eraIndex, instant = false) {
@@ -1416,7 +1560,10 @@
 
     triggerClickEffect(screenX, screenY) {
       this.pulse = 1.0;
-      const colors = ["#38bdf8", "#fbbf24", "#67e8f9", "#c084fc", "#f472b6", "#34d399", "#fde047"];
+      const colors = [
+        "#38bdf8", "#fbbf24", "#67e8f9", "#c084fc", "#f472b6",
+        "#a78bfa", "#34d399", "#38bdf8", "#e879f9", "#fde047"
+      ];
       const col = colors[this.currentEra] || "#38bdf8";
 
       for (let i = 0; i < 12; i++) {
@@ -1429,9 +1576,8 @@
         });
       }
 
-      const clkKeys = ["clk_1", "clk_2", "clk_3", "clk_4", "clk_5", "clk_6", "clk_7"];
-      const owned = state.clickUpgrades[clkKeys[this.currentEra]] || 0;
-      if (owned > 0) {
+      const clkId = `clk_${this.currentEra + 1}`;
+      if ((state.clickUpgrades[clkId] || 0) > 0) {
         if (this.currentEra <= 2) {
           this.clickBeams.push({
             x1: screenX, y1: screenY,
@@ -1442,8 +1588,7 @@
           this.shockwaves.push({
             radius: 14,
             maxRadius: Math.min(this.width, this.height) * 0.44,
-            life: 1.0,
-            color: col
+            life: 1.0, color: col
           });
         }
       }
@@ -1495,13 +1640,10 @@
       this.eraTransition *= Math.exp(-4.5 * dt);
 
       const bgPalettes = [
-        ["#07142e", "#02050c"],
-        ["#1a0f06", "#03040a"],
-        ["#071a2b", "#02050b"],
-        ["#130926", "#020309"],
-        ["#1c0922", "#030208"],
-        ["#160728", "#020207"],
-        ["#0b1632", "#04010c"]
+        ["#07142e", "#02050c"], ["#1a0f06", "#03040a"], ["#071a2b", "#02050b"],
+        ["#130926", "#020309"], ["#110c2a", "#020309"], ["#1c0922", "#030208"],
+        ["#160728", "#020207"], ["#07182a", "#020309"], ["#0b1632", "#04010c"],
+        ["#1f1505", "#040206"]
       ];
       const [c1, c2] = bgPalettes[this.currentEra] || bgPalettes[0];
       const bgGrad = ctx.createRadialGradient(
@@ -1513,7 +1655,6 @@
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, this.width, this.height);
 
-      // Background 3D Starfield
       for (const s of this.stars) {
         const p = this.project(s.x, s.y, s.z, this.rotX * 0.3, this.rotY * 0.25);
         if (p.scale <= 0) continue;
@@ -1523,27 +1664,28 @@
         ctx.fillRect(p.x - sr * 0.5, p.y - sr * 0.5, sr, sr);
       }
 
-      if (state.darkEnergy > 0) this.renderDarkEnergyAura(ctx, t);
+      if (state.darkEnergy > 0 || state.totalDarkEnergyEarned > 0) {
+        this.renderDarkEnergyAura(ctx, t);
+      }
 
       switch (this.currentEra) {
         case 0: this.renderEarthScene(ctx, t); break;
         case 1: this.renderSolarScene(ctx, t, dt); break;
         case 2: this.renderStarClusterScene(ctx, t); break;
         case 3: this.renderMilkyWayScene(ctx, t); break;
-        case 4: this.renderSuperclusterScene(ctx, t); break;
-        case 5: this.renderUniverseScene(ctx, t); break;
-        default: this.renderOmniverseScene(ctx, t); break;
+        case 4: this.renderLocalGroupScene(ctx, t); break;
+        case 5: this.renderSuperclusterScene(ctx, t); break;
+        case 6: this.renderUniverseScene(ctx, t); break;
+        case 7: this.renderMultiverseScene(ctx, t); break;
+        case 8: this.renderOmniverseScene(ctx, t); break;
+        default: this.renderArchitectVoidScene(ctx, t); break;
       }
 
-      // Shockwaves
       for (let i = this.shockwaves.length - 1; i >= 0; i--) {
         const sw = this.shockwaves[i];
         sw.radius += (sw.maxRadius - sw.radius) * (1 - Math.exp(-7 * dt));
         sw.life -= 1.8 * dt;
-        if (sw.life <= 0) {
-          this.shockwaves.splice(i, 1);
-          continue;
-        }
+        if (sw.life <= 0) { this.shockwaves.splice(i, 1); continue; }
         ctx.strokeStyle = sw.color;
         ctx.globalAlpha = sw.life * 0.75;
         ctx.lineWidth = 3 * sw.life;
@@ -1553,14 +1695,10 @@
       }
       ctx.globalAlpha = 1;
 
-      // Click Energy Beams
       for (let i = this.clickBeams.length - 1; i >= 0; i--) {
         const bm = this.clickBeams[i];
         bm.life -= 5.5 * dt;
-        if (bm.life <= 0) {
-          this.clickBeams.splice(i, 1);
-          continue;
-        }
+        if (bm.life <= 0) { this.clickBeams.splice(i, 1); continue; }
         ctx.strokeStyle = bm.color;
         ctx.globalAlpha = bm.life;
         ctx.lineWidth = 3.2 * bm.life;
@@ -1585,10 +1723,7 @@
         bp.x += bp.vx * dt * 60;
         bp.y += bp.vy * dt * 60;
         bp.life -= 2.0 * dt;
-        if (bp.life <= 0) {
-          this.burstParticles.splice(i, 1);
-          continue;
-        }
+        if (bp.life <= 0) { this.burstParticles.splice(i, 1); continue; }
         ctx.globalAlpha = bp.life;
         ctx.fillStyle = bp.color;
         ctx.beginPath();
@@ -1603,10 +1738,10 @@
       const cy = this.getCenterY();
       this.drawGlow(ctx, "purple", cx, cy, Math.min(this.width, this.height) * 0.34);
 
-      const count = Math.min(12, Math.max(3, Math.floor(Math.log2(state.darkEnergy + 1) * 2)));
+      const count = Math.min(12, Math.max(3, Math.floor(Math.log2(state.totalDarkEnergyEarned + 2) * 2)));
       for (let i = 0; i < count; i++) {
         const a = t * 0.6 + (i / count) * Math.PI * 2;
-        const p = this.project(Math.cos(a) * 230, Math.sin(a * 2) * 52, Math.sin(a) * 230);
+        const p = this.project(Math.cos(a) * 235, Math.sin(a * 2) * 52, Math.sin(a) * 235);
         if (p.scale <= 0) continue;
         ctx.fillStyle = "#d8b4fe";
         ctx.beginPath();
@@ -1616,7 +1751,7 @@
     }
 
     /* -----------------------------------------------------------------------
-       ERA I: ULTRA-HD GPU EARTH + CLOSED 3D MOON ORBIT + MEGACITIES + ELEVATORS
+       ERA I: 2K ULTRA-HD EARTH + CLOSED 3D MOON ORBIT + SEGMENTED ELEVATORS
     ----------------------------------------------------------------------- */
     renderEarthScene(ctx, t) {
       const worldR = Math.min(this.width, this.height) * 0.215 * (1 + this.pulse * 0.04);
@@ -1629,21 +1764,22 @@
       const elevators = state.generators.gen_3 || 0;
       const queue = [];
 
-      // True Closed Inclined 3D Moon Orbit
+      // True circular 3D inclined Moon orbit (x^2 + y^2 + z^2 = R^2)
       const moonOrbitR = worldR * 1.95;
-      const orbitTilt = 0.22;
+      const inc = 0.24;
+      const sinInc = Math.sin(inc), cosInc = Math.cos(inc);
       const moonAngle = t * 0.48;
       const mx = Math.cos(moonAngle) * moonOrbitR;
-      const my = Math.sin(moonAngle) * moonOrbitR * orbitTilt;
-      const mz = Math.sin(moonAngle) * moonOrbitR;
+      const my = Math.sin(moonAngle) * moonOrbitR * sinInc;
+      const mz = Math.sin(moonAngle) * moonOrbitR * cosInc;
       const moonProj = this.project(mx, my, mz);
 
       const orbitSegs = 64;
       for (let i = 0; i < orbitSegs; i++) {
         const a1 = (i / orbitSegs) * Math.PI * 2;
         const a2 = ((i + 1) / orbitSegs) * Math.PI * 2;
-        const p1 = this.project(Math.cos(a1) * moonOrbitR, Math.sin(a1) * moonOrbitR * orbitTilt, Math.sin(a1) * moonOrbitR);
-        const p2 = this.project(Math.cos(a2) * moonOrbitR, Math.sin(a2) * moonOrbitR * orbitTilt, Math.sin(a2) * moonOrbitR);
+        const p1 = this.project(Math.cos(a1) * moonOrbitR, Math.sin(a1) * moonOrbitR * sinInc, Math.sin(a1) * moonOrbitR * cosInc);
+        const p2 = this.project(Math.cos(a2) * moonOrbitR, Math.sin(a2) * moonOrbitR * sinInc, Math.sin(a2) * moonOrbitR * cosInc);
         if (p1.scale <= 0 || p2.scale <= 0) continue;
         queue.push({
           z: (p1.z + p2.z) * 0.5,
@@ -1675,7 +1811,7 @@
         }
       });
 
-      // 2. Ultra-HD Cratered Moon (with Earthshine + Lunar Bases)
+      // 2. Cratered GPU Moon with Earthshine
       if (moonProj.scale > 0) {
         queue.push({
           z: moonProj.z,
@@ -1692,7 +1828,7 @@
         });
       }
 
-      // 3. Lunar Colony Supply Shuttles
+      // 3. Lunar Colony Shuttles
       if (lunarColonies > 0 && moonProj.scale > 0) {
         const shuttleCount = Math.min(8, 1 + Math.floor(lunarColonies / 2));
         for (let i = 0; i < shuttleCount; i++) {
@@ -1714,14 +1850,14 @@
         }
       }
 
-      // 4. Core Extractor Orbiting Thermal Satellites
+      // 4. Core Extractor Thermal Satellites
       if (extractors > 0) {
         const satCount = Math.min(12, Math.max(2, Math.floor(extractors * 0.75)));
         for (let i = 0; i < satCount; i++) {
           const a = t * 0.85 + (i / satCount) * Math.PI * 2;
-          const inc = (i % 3 - 1) * 0.55;
+          const satInc = (i % 3 - 1) * 0.55;
           const r = worldR * 1.19;
-          const p = this.project(Math.cos(a) * r, Math.sin(a) * r * Math.sin(inc), Math.sin(a) * r * Math.cos(inc));
+          const p = this.project(Math.cos(a) * r, Math.sin(a) * r * Math.sin(satInc), Math.sin(a) * r * Math.cos(satInc));
           if (p.scale > 0) {
             queue.push({
               z: p.z,
@@ -1737,48 +1873,66 @@
         }
       }
 
-      // 5. 3D Space Elevators & Geostationary Orbital Ring
+      // 5. Segmented Space Elevators (prevents far-hemisphere poke-through!)
       if (elevators > 0) {
         const towerCount = Math.min(8, elevators);
         const topR = worldR * 1.48;
+        const subSegs = 4;
 
         for (let i = 0; i < towerCount; i++) {
           const lon = this.earthSpin + (i / towerCount) * Math.PI * 2;
-          const bx = Math.cos(lon) * worldR * 0.98, bz = Math.sin(lon) * worldR * 0.98;
-          const tx = Math.cos(lon) * topR, tz = Math.sin(lon) * topR;
-          const pBase = this.project(bx, 0, bz);
-          const pTop = this.project(tx, 0, tz);
-          if (pBase.scale <= 0 || pTop.scale <= 0) continue;
+          const cL = Math.cos(lon), sL = Math.sin(lon);
+
+          for (let s = 0; s < subSegs; s++) {
+            const r0 = worldR * 0.99 + (topR - worldR * 0.99) * (s / subSegs);
+            const r1 = worldR * 0.99 + (topR - worldR * 0.99) * ((s + 1) / subSegs);
+            const p0 = this.project(cL * r0, 0, sL * r0);
+            const p1 = this.project(cL * r1, 0, sL * r1);
+            if (p0.scale <= 0 || p1.scale <= 0) continue;
+
+            queue.push({
+              z: (p0.z + p1.z) * 0.5,
+              draw: () => {
+                ctx.strokeStyle = "rgba(56, 189, 248, 0.85)";
+                ctx.lineWidth = Math.max(1.2, 2.1 * p1.scale);
+                ctx.beginPath();
+                ctx.moveTo(p0.x, p0.y);
+                ctx.lineTo(p1.x, p1.y);
+                ctx.stroke();
+              }
+            });
+          }
+
+          const pTop = this.project(cL * topR, 0, sL * topR);
+          if (pTop.scale > 0) {
+            queue.push({
+              z: pTop.z,
+              draw: () => {
+                const stR = 3.8 * pTop.scale;
+                ctx.fillStyle = "#e0f2fe";
+                ctx.fillRect(pTop.x - stR, pTop.y - stR, stR * 2, stR * 2);
+              }
+            });
+          }
 
           const climbT = (t * 0.65 + i * 0.27) % 1;
-          const pClimb = this.project(bx + (tx - bx) * climbT, 0, bz + (tz - bz) * climbT);
-
-          queue.push({
-            z: (pBase.z + pTop.z) * 0.5,
-            draw: () => {
-              ctx.strokeStyle = "rgba(56, 189, 248, 0.85)";
-              ctx.lineWidth = Math.max(1.2, 2.2 * pTop.scale);
-              ctx.beginPath();
-              ctx.moveTo(pBase.x, pBase.y);
-              ctx.lineTo(pTop.x, pTop.y);
-              ctx.stroke();
-
-              const stR = 4.0 * pTop.scale;
-              ctx.fillStyle = "#e0f2fe";
-              ctx.fillRect(pTop.x - stR, pTop.y - stR, stR * 2, stR * 2);
-
-              if (pClimb.scale > 0) {
+          const rc = worldR * 0.99 + (topR - worldR * 0.99) * climbT;
+          const pClimb = this.project(cL * rc, 0, sL * rc);
+          if (pClimb.scale > 0) {
+            queue.push({
+              z: pClimb.z,
+              draw: () => {
                 ctx.fillStyle = "#fde047";
                 ctx.beginPath();
                 ctx.arc(pClimb.x, pClimb.y, 2.6 * pClimb.scale, 0, Math.PI * 2);
                 ctx.fill();
               }
-            }
-          });
+            });
+          }
         }
 
         if (elevators >= 3) {
-          const segs = 40;
+          const segs = 44;
           const ringAlpha = Math.min(0.9, 0.35 + (elevators - 2) * 0.12);
           for (let i = 0; i < segs; i++) {
             const a1 = this.earthSpin + (i / segs) * Math.PI * 2;
@@ -1790,7 +1944,7 @@
               z: (p1.z + p2.z) * 0.5,
               draw: () => {
                 ctx.strokeStyle = `rgba(125, 211, 252, ${ringAlpha})`;
-                ctx.lineWidth = Math.max(1.5, 3.0 * p1.scale);
+                ctx.lineWidth = Math.max(1.5, 2.8 * p1.scale);
                 ctx.beginPath();
                 ctx.moveTo(p1.x, p1.y);
                 ctx.lineTo(p2.x, p2.y);
@@ -1806,11 +1960,11 @@
     }
 
     /* -----------------------------------------------------------------------
-       ERA II: HD GPU SOLAR SYSTEM + ASTEROID MINERS + DYSON SWARM
+       ERA II: ALL 8 SOLAR SYSTEM PLANETS + TRUE 3D SHADOWED SATURN RINGS
     ----------------------------------------------------------------------- */
     renderSolarScene(ctx, t, dt) {
-      const scaleFactor = Math.min(this.width, this.height) / 700;
-      const sunWorldR = 38 * scaleFactor * (1 + this.pulse * 0.05);
+      const scaleFactor = Math.min(this.width, this.height) / 760;
+      const sunWorldR = 36 * scaleFactor * (1 + this.pulse * 0.05);
       const center = this.project(0, 0, 0);
       if (center.scale <= 0) return;
 
@@ -1820,15 +1974,17 @@
       const dysonSwarms = state.generators.gen_6 || 0;
       const queue = [];
 
+      // True Circular Inclined Orbital Rings for all 8 Planets
       ctx.lineWidth = 1;
       for (const pl of this.solarPlanets) {
         const d = pl.dist * scaleFactor;
-        ctx.strokeStyle = "rgba(251, 191, 36, 0.13)";
+        const sT = Math.sin(pl.tilt), cT = Math.cos(pl.tilt);
+        ctx.strokeStyle = pl.key === "neptune" ? "rgba(56, 189, 248, 0.16)" : "rgba(251, 191, 36, 0.13)";
         ctx.beginPath();
         let started = false;
-        for (let i = 0; i <= 56; i++) {
-          const a = (i / 56) * Math.PI * 2;
-          const op = this.project(Math.cos(a) * d, Math.sin(a) * d * pl.tilt, Math.sin(a) * d);
+        for (let i = 0; i <= 60; i++) {
+          const a = (i / 60) * Math.PI * 2;
+          const op = this.project(Math.cos(a) * d, Math.sin(a) * d * sT, Math.sin(a) * d * cT);
           if (op.scale <= 0) { started = false; continue; }
           if (!started) { ctx.moveTo(op.x, op.y); started = true; }
           else ctx.lineTo(op.x, op.y);
@@ -1843,88 +1999,157 @@
           const sr = sunWorldR * center.scale;
           this.drawGlow(ctx, "gold", center.x, center.y, sr * 2.55);
           this.gpuPlanets.draw(ctx, "sun", center.x, center.y, sr, {
-            rotX: this.rotX,
-            rotY: this.rotY,
-            spin: t * 0.18,
-            time: t
+            rotX: this.rotX, rotY: this.rotY, spin: t * 0.18, time: t
           });
         }
       });
 
-      // 2. Seven GPU-Shaded Planets (lit from the Sun)
+      // 2. All 8 Planets (Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune)
       for (const pl of this.solarPlanets) {
         pl.angle += pl.speed * dt;
         const d = pl.dist * scaleFactor;
+        const sT = Math.sin(pl.tilt), cT = Math.cos(pl.tilt);
         const px = Math.cos(pl.angle) * d;
-        const py = Math.sin(pl.angle) * d * pl.tilt;
-        const pz = Math.sin(pl.angle) * d;
+        const py = Math.sin(pl.angle) * d * sT;
+        const pz = Math.sin(pl.angle) * d * cT;
         const proj = this.project(px, py, pz);
         if (proj.scale <= 0) continue;
 
-        const invD = 1 / (Math.hypot(px, py, pz) || 1);
-        const sunLight = { x: -px * invD, y: -py * invD, z: -pz * invD };
-        const pr = pl.radius * scaleFactor * proj.scale;
+        const distLen = Math.hypot(px, py, pz) || 1;
+        const dxS = px / distLen, dyS = py / distLen, dzS = pz / distLen;
+        const sunLight = { x: -dxS, y: -dyS, z: -dzS };
+        const pWorldR = pl.radius * scaleFactor;
+        const pr = pWorldR * proj.scale;
 
         queue.push({
           z: proj.z,
           draw: () => {
             this.gpuPlanets.draw(ctx, pl.key, proj.x, proj.y, pr, {
-              rotX: this.rotX,
-              rotY: this.rotY,
-              spin: t * 0.8 + pl.angle,
-              time: t,
-              lightDir: sunLight
+              rotX: this.rotX, rotY: this.rotY, spin: t * 0.8 + pl.angle, time: t, lightDir: sunLight
             });
           }
         });
 
-        // Clip-safe Saturn 3D Rings
-        if (pl.ring) {
-          const rInner = pl.radius * 1.42 * scaleFactor;
-          const rOuter = pl.radius * 2.35 * scaleFactor;
-          const segs = 24;
+        // True 3D Axially-Tilted Saturn Rings (C/B/A bands, Cassini Division & Planet Shadow!)
+        if (pl.saturnRing) {
+          const tiltX = 0.466; // Real 26.7° axial obliquity
+          const tiltZ = 0.22;
+          const cX = Math.cos(tiltX), sX = Math.sin(tiltX);
+          const cZ = Math.cos(tiltZ), sZ = Math.sin(tiltZ);
+
+          const ringPoint = (rad, ang) => {
+            const rx = Math.cos(ang) * rad;
+            const rz = Math.sin(ang) * rad;
+            const y1 = -rz * sX;
+            const z1 = rz * cX;
+            return {
+              x: rx * cZ - y1 * sZ,
+              y: y1 * cZ + rx * sZ,
+              z: z1
+            };
+          };
+
+          const bands = [
+            { rIn: pWorldR * 1.24, rOut: pWorldR * 1.48, rgb: [188, 166, 130], a: 0.36 }, // C-Ring
+            { rIn: pWorldR * 1.48, rOut: pWorldR * 1.94, rgb: [246, 224, 174], a: 0.88 }, // Bright B-Ring
+            // Cassini Division Gap: 1.94R to 2.06R
+            { rIn: pWorldR * 2.06, rOut: pWorldR * 2.38, rgb: [224, 198, 148], a: 0.68 }  // Outer A-Ring
+          ];
+
+          const segs = 52;
+          const rSq = pWorldR * pWorldR;
+          for (let i = 0; i < segs; i++) {
+            const a1 = (i / segs) * Math.PI * 2;
+            const a2 = ((i + 1) / segs) * Math.PI * 2 + 0.012; // tiny overlap avoids hairline cracks
+            const aMid = (a1 + a2) * 0.5;
+
+            for (const band of bands) {
+              const midOff = ringPoint((band.rIn + band.rOut) * 0.5, aMid);
+              // Check if ring segment falls inside Saturn's cylindrical shadow cast away from the Sun
+              const along = midOff.x * dxS + midOff.y * dyS + midOff.z * dzS;
+              let shade = 1.0;
+              if (along > 0) {
+                const perp2 = (midOff.x * midOff.x + midOff.y * midOff.y + midOff.z * midOff.z) - along * along;
+                if (perp2 < rSq) shade = 0.22;
+              }
+
+              const o1i = ringPoint(band.rIn, a1);
+              const o1o = ringPoint(band.rOut, a1);
+              const o2o = ringPoint(band.rOut, a2);
+              const o2i = ringPoint(band.rIn, a2);
+
+              const p1i = this.project(px + o1i.x, py + o1i.y, pz + o1i.z);
+              const p1o = this.project(px + o1o.x, py + o1o.y, pz + o1o.z);
+              const p2o = this.project(px + o2o.x, py + o2o.y, pz + o2o.z);
+              const p2i = this.project(px + o2i.x, py + o2i.y, pz + o2i.z);
+              if (p1i.scale <= 0 || p1o.scale <= 0 || p2o.scale <= 0 || p2i.scale <= 0) continue;
+
+              const midProj = this.project(px + midOff.x, py + midOff.y, pz + midOff.z);
+              const cr = Math.round(band.rgb[0] * shade);
+              const cg = Math.round(band.rgb[1] * shade);
+              const cb = Math.round(band.rgb[2] * shade);
+
+              queue.push({
+                z: midProj.z,
+                draw: () => {
+                  ctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, ${band.a})`;
+                  ctx.beginPath();
+                  ctx.moveTo(p1i.x, p1i.y);
+                  ctx.lineTo(p1o.x, p1o.y);
+                  ctx.lineTo(p2o.x, p2o.y);
+                  ctx.lineTo(p2i.x, p2i.y);
+                  ctx.closePath();
+                  ctx.fill();
+                }
+              });
+            }
+          }
+        }
+
+        // Faint Vertically-Tilted Ring around Uranus (real ~98° obliquity)
+        if (pl.uranusRing) {
+          const rU = pWorldR * 1.65;
+          const segs = 28;
           for (let i = 0; i < segs; i++) {
             const a1 = (i / segs) * Math.PI * 2;
             const a2 = ((i + 1) / segs) * Math.PI * 2;
-            const p1i = this.project(px + Math.cos(a1) * rInner, py + Math.sin(a1) * rInner * 0.35, pz + Math.sin(a1) * rInner);
-            const p1o = this.project(px + Math.cos(a1) * rOuter, py + Math.sin(a1) * rOuter * 0.35, pz + Math.sin(a1) * rOuter);
-            const p2o = this.project(px + Math.cos(a2) * rOuter, py + Math.sin(a2) * rOuter * 0.35, pz + Math.sin(a2) * rOuter);
-            const p2i = this.project(px + Math.cos(a2) * rInner, py + Math.sin(a2) * rInner * 0.35, pz + Math.sin(a2) * rInner);
-            if (p1i.scale <= 0 || p1o.scale <= 0 || p2o.scale <= 0 || p2i.scale <= 0) continue;
-
+            const p1 = this.project(px + Math.cos(a1) * rU * 0.18, py + Math.cos(a1) * rU, pz + Math.sin(a1) * rU);
+            const p2 = this.project(px + Math.cos(a2) * rU * 0.18, py + Math.cos(a2) * rU, pz + Math.sin(a2) * rU);
+            if (p1.scale <= 0 || p2.scale <= 0) continue;
             queue.push({
-              z: (p1i.z + p2o.z) * 0.5,
+              z: (p1.z + p2.z) * 0.5,
               draw: () => {
-                ctx.fillStyle = i % 2 === 0 ? "rgba(253, 230, 138, 0.58)" : "rgba(217, 179, 108, 0.48)";
+                ctx.strokeStyle = "rgba(186, 230, 253, 0.34)";
+                ctx.lineWidth = Math.max(1, 1.4 * p1.scale);
                 ctx.beginPath();
-                ctx.moveTo(p1i.x, p1i.y); ctx.lineTo(p1o.x, p1o.y);
-                ctx.lineTo(p2o.x, p2o.y); ctx.lineTo(p2i.x, p2i.y);
-                ctx.closePath();
-                ctx.fill();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.stroke();
               }
             });
           }
         }
 
+        // Gas Giant Harvesters on Jupiter, Saturn, Uranus & Neptune
         if (pl.gasGiant && gasHarvesters > 0) {
-          const harvRingR = pl.radius * 1.55 * scaleFactor;
-          const drones = Math.min(8, 2 + gasHarvesters);
+          const harvRingR = pWorldR * 1.55;
+          const drones = Math.min(6, 1 + Math.floor(gasHarvesters / 2));
           for (let i = 0; i < drones; i++) {
             const a = t * 1.8 + (i / drones) * Math.PI * 2;
-            const hp = this.project(px + Math.cos(a) * harvRingR, py - pl.radius * 0.65 * scaleFactor, pz + Math.sin(a) * harvRingR);
+            const hp = this.project(px + Math.cos(a) * harvRingR, py - pWorldR * 0.65, pz + Math.sin(a) * harvRingR);
             if (hp.scale <= 0) continue;
             queue.push({
               z: hp.z,
               draw: () => {
-                ctx.strokeStyle = "rgba(56, 189, 248, 0.6)";
-                ctx.lineWidth = 1.4 * hp.scale;
+                ctx.strokeStyle = "rgba(56, 189, 248, 0.55)";
+                ctx.lineWidth = 1.3 * hp.scale;
                 ctx.beginPath();
                 ctx.moveTo(hp.x, hp.y);
                 ctx.lineTo(proj.x, proj.y);
                 ctx.stroke();
                 ctx.fillStyle = "#38bdf8";
                 ctx.beginPath();
-                ctx.arc(hp.x, hp.y, 2.5 * hp.scale, 0, Math.PI * 2);
+                ctx.arc(hp.x, hp.y, 2.3 * hp.scale, 0, Math.PI * 2);
                 ctx.fill();
               }
             });
@@ -1946,10 +2171,7 @@
             draw: () => {
               ctx.strokeStyle = "rgba(250, 204, 21, 0.55)";
               ctx.lineWidth = 2 * p1.scale;
-              ctx.beginPath();
-              ctx.moveTo(p1.x, p1.y);
-              ctx.lineTo(p2.x, p2.y);
-              ctx.stroke();
+              ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
             }
           });
         }
@@ -2001,10 +2223,8 @@
 
           for (let pIdx = 0; pIdx < panelsPerRing; pIdx++) {
             const a = ringSpin + (pIdx / panelsPerRing) * Math.PI * 2;
-            const x = Math.cos(a) * dysonR;
-            const z = Math.sin(a) * dysonR;
-            const y1 = -z * Math.sin(tiltX);
-            const z1 = z * Math.cos(tiltX);
+            const x = Math.cos(a) * dysonR, z = Math.sin(a) * dysonR;
+            const y1 = -z * Math.sin(tiltX), z1 = z * Math.cos(tiltX);
             const x2 = x * Math.cos(tiltZ) - y1 * Math.sin(tiltZ);
             const y2 = y1 * Math.cos(tiltZ) + x * Math.sin(tiltZ);
             const pp = this.project(x2, y2, z1);
@@ -2013,17 +2233,15 @@
             queue.push({
               z: pp.z,
               draw: () => {
-                const ps = Math.max(2.2, 4.5 * scaleFactor * pp.scale);
+                const ps = Math.max(2.2, 4.4 * scaleFactor * pp.scale);
                 ctx.fillStyle = pp.z < 0 ? "#fbbf24" : "#b45309";
                 ctx.strokeStyle = "#fef08a";
                 ctx.lineWidth = 0.8;
                 ctx.beginPath();
                 for (let k = 0; k < 6; k++) {
                   const ha = (k / 6) * Math.PI * 2;
-                  const hx = pp.x + Math.cos(ha) * ps;
-                  const hy = pp.y + Math.sin(ha) * ps;
-                  if (k === 0) ctx.moveTo(hx, hy);
-                  else ctx.lineTo(hx, hy);
+                  const hx = pp.x + Math.cos(ha) * ps, hy = pp.y + Math.sin(ha) * ps;
+                  if (k === 0) ctx.moveTo(hx, hy); else ctx.lineTo(hx, hy);
                 }
                 ctx.closePath();
                 ctx.fill();
@@ -2066,16 +2284,12 @@
         const activeLanes = Math.min(this.clusterLanes.length, 4 + warpGates * 4);
         for (let i = 0; i < activeLanes; i++) {
           const lane = this.clusterLanes[i];
-          const a = projected[lane.a];
-          const b = projected[lane.b];
+          const a = projected[lane.a], b = projected[lane.b];
           if (a.scale <= 0 || b.scale <= 0) continue;
 
           ctx.strokeStyle = "rgba(56, 189, 248, 0.38)";
           ctx.lineWidth = 1.6 * ((a.scale + b.scale) * 0.5);
-          ctx.beginPath();
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
-          ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
 
           const prog = (t * 0.75 + lane.phase) % 1;
           ctx.fillStyle = "#e0f2fe";
@@ -2087,16 +2301,12 @@
 
       const sorted = [...projected].sort((a, b) => b.z - a.z);
       const ringedStars = Math.min(14, starRings * 2);
-
       for (const p of sorted) {
         if (p.scale <= 0) continue;
         const r = p.st.radius * scaleFactor * p.scale * (1 + 0.08 * Math.sin(t * 2.5 + p.st.phase));
-
         this.drawGlow(ctx, p.st.glow, p.x, p.y, r * 2.6);
         ctx.fillStyle = p.st.core;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, r * 0.48, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(p.x, p.y, r * 0.48, 0, Math.PI * 2); ctx.fill();
 
         if (p.idx < ringedStars) {
           ctx.strokeStyle = "rgba(253, 224, 71, 0.8)";
@@ -2109,7 +2319,7 @@
     }
 
     /* -----------------------------------------------------------------------
-       ERA IV: MILKY WAY (CLIP-SAFE PULSARS & BLACK HOLE ACCRETION DISK)
+       ERA IV: MILKY WAY
     ----------------------------------------------------------------------- */
     renderMilkyWayScene(ctx, t) {
       const scaleFactor = (Math.min(this.width, this.height) / 560) * (1 + this.pulse * 0.05);
@@ -2156,22 +2366,15 @@
           const by = Math.sin(pul.tilt) * beamLen * 0.85;
           const bz = Math.sin(beamAngle) * beamLen;
 
-          const pTip1 = this.project((pul.x + bx) * scaleFactor, (pul.y + by) * scaleFactor, (pul.z + bz) * scaleFactor);
-          const pTip2 = this.project((pul.x - bx) * scaleFactor, (pul.y - by) * scaleFactor, (pul.z - bz) * scaleFactor);
-
-          if (pTip1.scale > 0 && pTip2.scale > 0) {
+          const p1 = this.project((pul.x + bx) * scaleFactor, (pul.y + by) * scaleFactor, (pul.z + bz) * scaleFactor);
+          const p2 = this.project((pul.x - bx) * scaleFactor, (pul.y - by) * scaleFactor, (pul.z - bz) * scaleFactor);
+          if (p1.scale > 0 && p2.scale > 0) {
             ctx.strokeStyle = "rgba(56, 189, 248, 0.72)";
             ctx.lineWidth = 2.2 * p.scale;
-            ctx.beginPath();
-            ctx.moveTo(pTip1.x, pTip1.y);
-            ctx.lineTo(pTip2.x, pTip2.y);
-            ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
           }
-
           ctx.fillStyle = "#e0f2fe";
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, 3.4 * p.scale, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.beginPath(); ctx.arc(p.x, p.y, 3.4 * p.scale, 0, Math.PI * 2); ctx.fill();
         }
       }
 
@@ -2180,23 +2383,19 @@
         const jetH = (125 + Math.min(85, penroseCount * 11)) * scaleFactor;
         const queue = [];
 
-        const pTop = this.project(0, -jetH, 0);
-        const pBot = this.project(0, jetH, 0);
+        const pTop = this.project(0, -jetH, 0), pBot = this.project(0, jetH, 0);
         if (pTop.scale > 0 && pBot.scale > 0) {
           queue.push({
             z: center.z + 5,
             draw: () => {
-              const jGrad1 = ctx.createLinearGradient(center.x, center.y, pTop.x, pTop.y);
-              jGrad1.addColorStop(0, "rgba(192, 132, 252, 0.92)");
-              jGrad1.addColorStop(1, "rgba(56, 189, 248, 0)");
-              ctx.strokeStyle = jGrad1;
-              ctx.lineWidth = 7 * center.scale;
+              const g1 = ctx.createLinearGradient(center.x, center.y, pTop.x, pTop.y);
+              g1.addColorStop(0, "rgba(192, 132, 252, 0.92)"); g1.addColorStop(1, "rgba(56, 189, 248, 0)");
+              ctx.strokeStyle = g1; ctx.lineWidth = 7 * center.scale;
               ctx.beginPath(); ctx.moveTo(center.x, center.y); ctx.lineTo(pTop.x, pTop.y); ctx.stroke();
 
-              const jGrad2 = ctx.createLinearGradient(center.x, center.y, pBot.x, pBot.y);
-              jGrad2.addColorStop(0, "rgba(192, 132, 252, 0.92)");
-              jGrad2.addColorStop(1, "rgba(56, 189, 248, 0)");
-              ctx.strokeStyle = jGrad2;
+              const g2 = ctx.createLinearGradient(center.x, center.y, pBot.x, pBot.y);
+              g2.addColorStop(0, "rgba(192, 132, 252, 0.92)"); g2.addColorStop(1, "rgba(56, 189, 248, 0)");
+              ctx.strokeStyle = g2;
               ctx.beginPath(); ctx.moveTo(center.x, center.y); ctx.lineTo(pBot.x, pBot.y); ctx.stroke();
             }
           });
@@ -2205,7 +2404,7 @@
         const segs = 30;
         for (let i = 0; i < segs; i++) {
           const a1 = t * 2.2 + (i / segs) * Math.PI * 2;
-          const a2 = t * 2.2 + ((i + 1) / segs) * Math.PI * 2;
+          const a2 = t * 2.2 + ((i + 1) / segs) * Math.PI * 2 + 0.02;
           const rIn = bhR * 1.3, rOut = bhR * 2.8;
           const p1i = this.project(Math.cos(a1) * rIn, 0, Math.sin(a1) * rIn);
           const p1o = this.project(Math.cos(a1) * rOut, 0, Math.sin(a1) * rOut);
@@ -2220,8 +2419,7 @@
               ctx.beginPath();
               ctx.moveTo(p1i.x, p1i.y); ctx.lineTo(p1o.x, p1o.y);
               ctx.lineTo(p2o.x, p2o.y); ctx.lineTo(p2i.x, p2i.y);
-              ctx.closePath();
-              ctx.fill();
+              ctx.closePath(); ctx.fill();
             }
           });
         }
@@ -2229,14 +2427,9 @@
         queue.push({
           z: center.z,
           draw: () => {
-            const sr = bhR * center.scale;
-            ctx.strokeStyle = "#fde047";
-            ctx.lineWidth = 2.6;
-            ctx.fillStyle = "#020205";
-            ctx.beginPath();
-            ctx.arc(center.x, center.y, sr, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
+            ctx.strokeStyle = "#fde047"; ctx.lineWidth = 2.6; ctx.fillStyle = "#020205";
+            ctx.beginPath(); ctx.arc(center.x, center.y, bhR * center.scale, 0, Math.PI * 2);
+            ctx.fill(); ctx.stroke();
           }
         });
 
@@ -2246,15 +2439,105 @@
     }
 
     /* -----------------------------------------------------------------------
-       ERA V: LANIAKEA SUPERCLUSTER
+       ERA V: LOCAL GROUP (ANDROMEDA + MILKY WAY 3D COLLISION!)
+    ----------------------------------------------------------------------- */
+    renderLocalGroupScene(ctx, t) {
+      const scaleFactor = (Math.min(this.width, this.height) / 560) * (1 + this.pulse * 0.05);
+      const bridges = state.generators.gen_13 || 0;
+      const dwarfs = state.generators.gen_14 || 0;
+      const collider = state.generators.gen_15 || 0;
+
+      const orbitA = t * 0.25;
+      const sep = 105 * scaleFactor;
+      const ax = Math.cos(orbitA) * sep, az = Math.sin(orbitA) * sep;
+      const bx = -ax, bz = -az;
+
+      const pA = this.project(ax, -18 * scaleFactor, az);
+      const pB = this.project(bx, 18 * scaleFactor, bz);
+
+      if (pA.scale > 0) this.drawGlow(ctx, "blue", pA.x, pA.y, 65 * scaleFactor * pA.scale);
+      if (pB.scale > 0) this.drawGlow(ctx, "purple", pB.x, pB.y, 78 * scaleFactor * pB.scale);
+
+      // Tidal Stellar Bridge between Milky Way & Andromeda
+      if (bridges > 0 && pA.scale > 0 && pB.scale > 0) {
+        const strands = Math.min(6, 1 + Math.floor(bridges / 2));
+        for (let s = 0; s < strands; s++) {
+          ctx.strokeStyle = s % 2 === 0 ? "rgba(125, 211, 252, 0.55)" : "rgba(232, 121, 249, 0.5)";
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          const midX = (pA.x + pB.x) * 0.5 + Math.sin(t + s) * 28;
+          const midY = (pA.y + pB.y) * 0.5 + Math.cos(t + s) * 24;
+          ctx.moveTo(pA.x, pA.y);
+          ctx.quadraticCurveTo(midX, midY, pB.x, pB.y);
+          ctx.stroke();
+        }
+      }
+
+      // Spin Milky Way (A) & Andromeda (B)
+      const spinA = t * 0.35, spinB = -t * 0.28;
+      const cA = Math.cos(spinA), sA = Math.sin(spinA);
+      for (const st of this.localGroupA) {
+        const rx = st.x * cA - st.z * sA, rz = st.z * cA + st.x * sA;
+        const p = this.project(ax + rx * scaleFactor, (st.y - 18) * scaleFactor, az + rz * scaleFactor);
+        if (p.scale <= 0) continue;
+        ctx.fillStyle = st.color;
+        ctx.globalAlpha = Math.min(0.95, 0.55 * p.scale);
+        const sz = st.size * p.scale;
+        ctx.fillRect(p.x - sz * 0.5, p.y - sz * 0.5, sz, sz);
+      }
+
+      const cB = Math.cos(spinB), sB = Math.sin(spinB);
+      for (const st of this.localGroupB) {
+        const rx = st.x * cB - st.z * sB, rz = st.z * cB + st.x * sB;
+        const p = this.project(bx + rx * scaleFactor, (st.y + 18) * scaleFactor, bz + rz * scaleFactor);
+        if (p.scale <= 0) continue;
+        ctx.fillStyle = st.color;
+        ctx.globalAlpha = Math.min(0.95, 0.55 * p.scale);
+        const sz = st.size * p.scale;
+        ctx.fillRect(p.x - sz * 0.5, p.y - sz * 0.5, sz, sz);
+      }
+      ctx.globalAlpha = 1;
+
+      // Satellite Dwarf Galaxies (Triangulum & Magellanic Clouds)
+      if (dwarfs > 0) {
+        const count = Math.min(this.dwarfGalaxies.length, 3 + dwarfs * 2);
+        for (let i = 0; i < count; i++) {
+          const d = this.dwarfGalaxies[i];
+          const a = d.angle + t * d.speed;
+          const p = this.project(Math.cos(a) * d.r * scaleFactor, d.y * scaleFactor, Math.sin(a) * d.r * scaleFactor);
+          if (p.scale <= 0) continue;
+          this.drawGlow(ctx, i % 2 === 0 ? "cyan" : "gold", p.x, p.y, d.size * 2 * scaleFactor * p.scale);
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath(); ctx.arc(p.x, p.y, 2.5 * p.scale, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+
+      // Binary Core Collider Gravitational Vortex
+      if (collider > 0) {
+        const center = this.project(0, 0, 0);
+        if (center.scale > 0) {
+          this.drawGlow(ctx, "gold", center.x, center.y, 58 * scaleFactor * center.scale);
+          for (let r = 0; r < 3; r++) {
+            ctx.strokeStyle = "rgba(253, 224, 71, 0.65)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.ellipse(center.x, center.y, (32 + r * 22) * scaleFactor * center.scale, (12 + r * 9) * scaleFactor * center.scale, t * (1 + r * 0.3), 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    /* -----------------------------------------------------------------------
+       ERA VI: LANIAKEA SUPERCLUSTER
     ----------------------------------------------------------------------- */
     renderSuperclusterScene(ctx, t) {
       const scaleFactor = (Math.min(this.width, this.height) / 550) * (1 + this.pulse * 0.05);
       const center = this.project(0, 0, 0);
 
-      const tidalSiphons = state.generators.gen_13 || 0;
-      const darkConduits = state.generators.gen_14 || 0;
-      const greatAttractor = state.generators.gen_15 || 0;
+      const tidalSiphons = state.generators.gen_16 || 0;
+      const darkConduits = state.generators.gen_17 || 0;
+      const greatAttractor = state.generators.gen_18 || 0;
 
       const projected = this.superGalaxies.map((g, idx) => {
         const flow = Math.sin(t * 0.6 + g.phase) * 5;
@@ -2281,13 +2564,9 @@
         ctx.strokeStyle = "rgba(125, 211, 252, 0.45)";
         ctx.lineWidth = 1.5;
         for (let i = 0; i < bridges; i++) {
-          const a = projected[i];
-          const b = projected[(i + 5) % projected.length];
+          const a = projected[i], b = projected[(i + 5) % projected.length];
           if (a.scale <= 0 || b.scale <= 0) continue;
-          ctx.beginPath();
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
-          ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
         }
       }
 
@@ -2316,25 +2595,21 @@
         ctx.rotate(p.g.tilt + t * 0.25);
         ctx.strokeStyle = "rgba(224, 242, 254, 0.72)";
         ctx.lineWidth = Math.max(1, r * 0.14);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, r * 0.95, r * 0.36, 0, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(0, 0, r * 0.95, r * 0.36, 0, 0, Math.PI * 2); ctx.stroke();
         ctx.fillStyle = "#ffffff";
-        ctx.beginPath();
-        ctx.arc(0, 0, r * 0.22, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(0, 0, r * 0.22, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
       }
     }
 
     /* -----------------------------------------------------------------------
-       ERA VI: OBSERVABLE UNIVERSE
+       ERA VII: OBSERVABLE UNIVERSE
     ----------------------------------------------------------------------- */
     renderUniverseScene(ctx, t) {
       const scaleFactor = (Math.min(this.width, this.height) / 540) * (1 + this.pulse * 0.05);
-      const quasars = state.generators.gen_16 || 0;
-      const looms = state.generators.gen_17 || 0;
-      const vacuumEngines = state.generators.gen_18 || 0;
+      const quasars = state.generators.gen_19 || 0;
+      const looms = state.generators.gen_20 || 0;
+      const vacuumEngines = state.generators.gen_21 || 0;
 
       const projected = this.webNodes.map((n, idx) => {
         const wobble = Math.sin(t * 1.4 + n.phase) * 4;
@@ -2345,20 +2620,14 @@
       const loomBoost = Math.min(1, looms * 0.16);
       for (let i = 0; i < this.webEdges.length; i++) {
         const edge = this.webEdges[i];
-        const a = projected[edge.a];
-        const b = projected[edge.b];
+        const a = projected[edge.a], b = projected[edge.b];
         if (a.scale <= 0 || b.scale <= 0) continue;
 
         const avgScale = (a.scale + b.scale) * 0.5;
         const depthAlpha = clamp(avgScale - 0.5, 0.08, 0.45) + loomBoost * 0.35;
-        ctx.strokeStyle = looms > 0
-          ? `rgba(129, 140, 248, ${Math.min(0.85, depthAlpha)})`
-          : `rgba(168, 85, 247, ${depthAlpha})`;
+        ctx.strokeStyle = looms > 0 ? `rgba(129, 140, 248, ${Math.min(0.85, depthAlpha)})` : `rgba(168, 85, 247, ${depthAlpha})`;
         ctx.lineWidth = (1.0 + loomBoost * 1.2) * avgScale;
-        ctx.beginPath();
-        ctx.moveTo(a.x, a.y);
-        ctx.lineTo(b.x, b.y);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
 
         if (looms > 0 && i % Math.max(1, 6 - Math.min(5, looms)) === 0) {
           const prog = (t * 0.7 + edge.phase) % 1;
@@ -2371,12 +2640,10 @@
 
       const sorted = [...projected].sort((a, b) => b.z - a.z);
       const quasarCount = Math.min(20, quasars * 2);
-
       for (const p of sorted) {
         if (p.scale <= 0) continue;
         const isQuasar = p.idx < quasarCount;
         const pulseR = p.node.size * p.scale * (1 + 0.22 * Math.sin(t * 3 + p.node.phase));
-
         if (isQuasar) {
           const jLen = 28 * p.scale;
           ctx.strokeStyle = "rgba(254, 240, 138, 0.85)";
@@ -2388,9 +2655,7 @@
           this.drawGlow(ctx, "gold", p.x, p.y, pulseR * 3.8);
         } else {
           ctx.fillStyle = p.node.color;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, pulseR, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.beginPath(); ctx.arc(p.x, p.y, pulseR, 0, Math.PI * 2); ctx.fill();
         }
       }
 
@@ -2411,16 +2676,105 @@
     }
 
     /* -----------------------------------------------------------------------
-       ERA VII: THE OMNIVERSE (4D TESSERACT + 3D BUBBLE UNIVERSES)
+       ERA VIII: THE MULTIVERSE (STACKED 3D COSMIC BRANES & QUANTUM FOAM)
+    ----------------------------------------------------------------------- */
+    renderMultiverseScene(ctx, t) {
+      const scaleFactor = (Math.min(this.width, this.height) / 540) * (1 + this.pulse * 0.05);
+      const foam = state.generators.gen_22 || 0;
+      const anchors = state.generators.gen_23 || 0;
+      const rifts = state.generators.gen_24 || 0;
+
+      // 1. Shimmering Quantum Foam Particles
+      const foamVis = Math.min(this.foamDots.length, 45 + foam * 12);
+      for (let i = 0; i < foamVis; i++) {
+        const f = this.foamDots[i];
+        const waveY = Math.sin(t * 1.8 + f.phase) * 10;
+        const p = this.project(f.x * scaleFactor, (f.y + waveY) * scaleFactor, f.z * scaleFactor);
+        if (p.scale <= 0) continue;
+        ctx.fillStyle = f.color;
+        ctx.globalAlpha = 0.55;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 2.2 * p.scale, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      // 2. Stacked 3D Parallel Cosmic Brane Planes
+      const braneCount = Math.min(6, 3 + Math.floor(anchors / 2));
+      const braneColors = ["#38bdf8", "#c084fc", "#f472b6", "#34d399", "#fbbf24", "#818cf8"];
+      const half = 155 * scaleFactor;
+      const grid = 6;
+
+      for (let b = 0; b < braneCount; b++) {
+        const yBase = ((b - (braneCount - 1) * 0.5) * 62) * scaleFactor;
+        ctx.strokeStyle = braneColors[b % braneColors.length];
+        ctx.globalAlpha = 0.42;
+        ctx.lineWidth = 1.25;
+
+        for (let g = 0; g <= grid; g++) {
+          const u = -half + (g / grid) * half * 2;
+          // Line along X
+          ctx.beginPath();
+          let started = false;
+          for (let k = 0; k <= grid; k++) {
+            const v = -half + (k / grid) * half * 2;
+            const rip = Math.sin(t * 1.7 + (u + v) * 0.025 + b) * 8 * scaleFactor;
+            const p = this.project(v, yBase + rip, u);
+            if (p.scale <= 0) { started = false; continue; }
+            if (!started) { ctx.moveTo(p.x, p.y); started = true; } else ctx.lineTo(p.x, p.y);
+          }
+          ctx.stroke();
+
+          // Line along Z
+          ctx.beginPath();
+          started = false;
+          for (let k = 0; k <= grid; k++) {
+            const v = -half + (k / grid) * half * 2;
+            const rip = Math.sin(t * 1.7 + (u + v) * 0.025 + b) * 8 * scaleFactor;
+            const p = this.project(u, yBase + rip, v);
+            if (p.scale <= 0) { started = false; continue; }
+            if (!started) { ctx.moveTo(p.x, p.y); started = true; } else ctx.lineTo(p.x, p.y);
+          }
+          ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1;
+
+      // 3. Vertical Golden Chronos Rift Conduits piercing the Branes
+      if (rifts > 0) {
+        const riftCount = Math.min(10, 2 + rifts);
+        const topY = -((braneCount - 1) * 36) * scaleFactor;
+        const botY = -topY;
+        for (let i = 0; i < riftCount; i++) {
+          const a = t * 0.35 + (i / riftCount) * Math.PI * 2;
+          const rx = Math.cos(a) * 95 * scaleFactor;
+          const rz = Math.sin(a) * 95 * scaleFactor;
+          const pTop = this.project(rx, topY, rz);
+          const pBot = this.project(rx, botY, rz);
+          if (pTop.scale <= 0 || pBot.scale <= 0) continue;
+
+          ctx.strokeStyle = "rgba(253, 224, 71, 0.78)";
+          ctx.lineWidth = 2.4;
+          ctx.beginPath(); ctx.moveTo(pTop.x, pTop.y); ctx.lineTo(pBot.x, pBot.y); ctx.stroke();
+
+          const prog = (t * 0.9 + i * 0.21) % 1;
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(pTop.x + (pBot.x - pTop.x) * prog, pTop.y + (pBot.y - pTop.y) * prog, 3.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    /* -----------------------------------------------------------------------
+       ERA IX: THE OMNIVERSE (4D TESSERACT + 3D BUBBLE UNIVERSES)
     ----------------------------------------------------------------------- */
     renderOmniverseScene(ctx, t) {
       const scaleFactor = (Math.min(this.width, this.height) / 540) * (1 + this.pulse * 0.05);
       const center = this.project(0, 0, 0);
       if (center.scale <= 0) return;
 
-      const bubblesOwned = state.generators.gen_19 || 0;
-      const wormholesOwned = state.generators.gen_20 || 0;
-      const loomOwned = state.generators.gen_21 || 0;
+      const bubblesOwned = state.generators.gen_25 || 0;
+      const wormholesOwned = state.generators.gen_26 || 0;
+      const loomOwned = state.generators.gen_27 || 0;
 
       this.drawGlow(ctx, "purple", center.x, center.y, 120 * scaleFactor * center.scale);
 
@@ -2437,26 +2791,18 @@
       if (wormholesOwned > 0 && bubbleProjs.length > 1) {
         const links = Math.min(bubbleProjs.length, 3 + wormholesOwned * 2);
         for (let i = 0; i < links; i++) {
-          const p1 = bubbleProjs[i];
-          const p2 = bubbleProjs[(i + 1) % bubbleProjs.length];
+          const p1 = bubbleProjs[i], p2 = bubbleProjs[(i + 1) % bubbleProjs.length];
           if (p1.scale <= 0 || p2.scale <= 0) continue;
 
           ctx.strokeStyle = "rgba(56, 189, 248, 0.52)";
           ctx.lineWidth = 1.8;
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.quadraticCurveTo(center.x, center.y, p2.x, p2.y);
-          ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.quadraticCurveTo(center.x, center.y, p2.x, p2.y); ctx.stroke();
 
           const prog = (t * 0.8 + i * 0.17) % 1;
           const u = 1 - prog;
           ctx.fillStyle = "#fde047";
           ctx.beginPath();
-          ctx.arc(
-            u * u * p1.x + 2 * u * prog * center.x + prog * prog * p2.x,
-            u * u * p1.y + 2 * u * prog * center.y + prog * prog * p2.y,
-            2.8, 0, Math.PI * 2
-          );
+          ctx.arc(u * u * p1.x + 2 * u * prog * center.x + prog * prog * p2.x, u * u * p1.y + 2 * u * prog * center.y + prog * prog * p2.y, 2.8, 0, Math.PI * 2);
           ctx.fill();
         }
       }
@@ -2479,18 +2825,13 @@
         draw: () => {
           ctx.lineWidth = loomOwned > 0 ? 2.4 : 1.7;
           for (const [i, j] of this.tesseractEdges) {
-            const p1 = projTess[i];
-            const p2 = projTess[j];
+            const p1 = projTess[i], p2 = projTess[j];
             if (p1.scale <= 0 || p2.scale <= 0) continue;
             ctx.strokeStyle = (i >= 8 && j >= 8) ? "rgba(56, 189, 248, 0.92)"
               : (i < 8 && j < 8) ? "rgba(232, 121, 249, 0.92)"
               : "rgba(253, 224, 71, 0.8)";
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
           }
-
           if (loomOwned > 0) {
             const rings = Math.min(4, 1 + Math.floor(loomOwned / 2));
             for (let r = 0; r < rings; r++) {
@@ -2511,23 +2852,10 @@
           z: bp.z,
           draw: () => {
             const r = bp.b.radius * scaleFactor * bp.scale;
-            ctx.fillStyle = bp.b.fill;
-            ctx.strokeStyle = bp.b.stroke;
-            ctx.lineWidth = 1.6;
-            ctx.beginPath();
-            ctx.arc(bp.x, bp.y, r, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-
+            ctx.fillStyle = bp.b.fill; ctx.strokeStyle = bp.b.stroke; ctx.lineWidth = 1.6;
+            ctx.beginPath(); ctx.arc(bp.x, bp.y, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
             ctx.fillStyle = "rgba(255, 255, 255, 0.72)";
-            ctx.beginPath();
-            ctx.arc(bp.x - r * 0.32, bp.y - r * 0.32, r * 0.2, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = "#ffffff";
-            ctx.beginPath();
-            ctx.arc(bp.x, bp.y, r * 0.12, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(bp.x - r * 0.32, bp.y - r * 0.32, r * 0.2, 0, Math.PI * 2); ctx.fill();
           }
         });
       }
@@ -2535,13 +2863,81 @@
       queue.sort((a, b) => b.z - a.z);
       for (const item of queue) item.draw();
     }
+
+    /* -----------------------------------------------------------------------
+       ERA X: THE ARCHITECT'S VOID (SACRED GOLDEN 3D MERKABA CORE!)
+    ----------------------------------------------------------------------- */
+    renderArchitectVoidScene(ctx, t) {
+      const scaleFactor = (Math.min(this.width, this.height) / 540) * (1 + this.pulse * 0.05);
+      const center = this.project(0, 0, 0);
+      if (center.scale <= 0) return;
+
+      const axioms = state.generators.gen_28 || 0;
+      const merkaba = state.generators.gen_29 || 0;
+      const infinityLoom = state.generators.gen_30 || 0;
+
+      this.drawGlow(ctx, "gold", center.x, center.y, 140 * scaleFactor * center.scale);
+
+      const size = (88 + Math.min(30, merkaba * 3)) * scaleFactor;
+      const drawTetra = (verts, spin, color, lw) => {
+        const c = Math.cos(spin), s = Math.sin(spin);
+        const pts = verts.map(([x, y, z]) => {
+          const rx = x * c - z * s, rz = z * c + x * s;
+          return this.project(rx * size, y * size, rz * size);
+        });
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lw;
+        for (const [a, b] of this.tetraEdges) {
+          if (pts[a].scale > 0 && pts[b].scale > 0) {
+            ctx.beginPath(); ctx.moveTo(pts[a].x, pts[a].y); ctx.lineTo(pts[b].x, pts[b].y); ctx.stroke();
+          }
+        }
+      };
+
+      // Counter-rotating Sacred Star Tetrahedron (Merkaba)
+      drawTetra(this.tetraA, t * 0.65, "rgba(253, 224, 71, 0.94)", 2.6);
+      drawTetra(this.tetraB, -t * 0.65, "rgba(56, 189, 248, 0.92)", 2.6);
+
+      // Orbiting Platonic Axiom Shards
+      if (axioms > 0) {
+        const shards = Math.min(18, 4 + axioms * 2);
+        for (let i = 0; i < shards; i++) {
+          const a = t * 0.55 + (i / shards) * Math.PI * 2;
+          const r = 165 * scaleFactor;
+          const p = this.project(Math.cos(a) * r, Math.sin(a * 2) * 55 * scaleFactor, Math.sin(a) * r);
+          if (p.scale <= 0) continue;
+          const sz = 6.5 * p.scale;
+          ctx.strokeStyle = "#fde047";
+          ctx.fillStyle = "rgba(251, 191, 36, 0.35)";
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y - sz); ctx.lineTo(p.x + sz, p.y);
+          ctx.lineTo(p.x, p.y + sz); ctx.lineTo(p.x - sz, p.y);
+          ctx.closePath(); ctx.fill(); ctx.stroke();
+        }
+      }
+
+      // Infinity Singularity Crown Rings & Hyper-Beams
+      if (infinityLoom > 0) {
+        const rings = Math.min(5, 2 + Math.floor(infinityLoom / 2));
+        for (let r = 0; r < rings; r++) {
+          const rad = (118 + r * 26) * scaleFactor * center.scale;
+          ctx.strokeStyle = r % 2 === 0 ? "rgba(253, 224, 71, 0.72)" : "rgba(232, 121, 249, 0.68)";
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.ellipse(center.x, center.y, rad, rad * 0.38, t * (0.5 + r * 0.2) * (r % 2 ? -1 : 1), 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+    }
   }
 
   const canvas = document.getElementById("cosmosCanvas");
   const cosmos3D = new Cosmos3DEngine(canvas);
 
+  // === END OF PART 2/3 — PASTE PART 3/3 DIRECTLY BELOW THIS LINE ===
   /* =========================================================================
-     8. CANVAS INTERACTION (CLICK, SMOOTH ORBIT DRAG & SCROLL ZOOM)
+     8. CANVAS INTERACTION (CLICK, ORBIT DRAG, ZOOM & AUTO-HARVESTER)
   ========================================================================= */
   let isDragging = false;
   let dragMoved = false;
@@ -2591,10 +2987,13 @@
   }, { passive: false });
 
   function handleCosmosClick(clientX, clientY) {
-    const gain = getMpc();
-    state.matter += gain;
-    state.runMatterEarned += gain;
-    state.lifetimeMatterEarned += gain;
+    const gainM = getMpc();
+    const gainE = getEpc();
+
+    state.matter += gainM;
+    state.energy += gainE;
+    state.runMatterEarned += gainM;
+    state.lifetimeMatterEarned += gainM;
 
     audio.playClick(state.era);
 
@@ -2603,7 +3002,7 @@
     const y = clientY - rect.top;
 
     cosmos3D.triggerClickEffect(x, y);
-    spawnFloatingText(x, y, `+${formatNum(gain)}`);
+    spawnFloatingText(x, y, `+${formatNum(gainM)}`);
     updateHUD();
     refreshAffordability();
   }
@@ -2619,7 +3018,7 @@
   }
 
   /* =========================================================================
-     9. UI RENDERING, ACTIVE 3D STRUCTURES & ACTIONS
+     9. UI RENDERING, RESEARCH LAB, DARK ENERGY SHOP & ACTIONS
   ========================================================================= */
   function updateStructuresBar() {
     const bar = document.getElementById("structuresBar");
@@ -2636,6 +3035,11 @@
       if (cnt > 0) active.push(`${g.icon} ${g.name} x${cnt}`);
     }
 
+    const droneLv = state.deShop.de_drone || 0;
+    if (droneLv > 0) {
+      active.push(`🤖 Auto-Harvester (${droneLv * 2}/s)`);
+    }
+
     if (active.length === 0) {
       bar.innerHTML = `<span style="opacity:0.7">Purchase upgrades to construct 3D structures on this Era's model</span>`;
     } else {
@@ -2647,13 +3051,24 @@
     document.getElementById("matterDisplay").textContent = formatNum(state.matter);
     document.getElementById("mpsDisplay").textContent = formatNum(getMps());
     document.getElementById("mpcDisplay").textContent = formatNum(getMpc());
+    document.getElementById("energyDisplay").textContent = formatNum(state.energy);
+    document.getElementById("epsDisplay").textContent = formatNum(getEps());
     document.getElementById("totalEarnedDisplay").textContent = `Run Matter: ${formatNum(state.runMatterEarned)}`;
     document.getElementById("eraBadge").textContent = ERAS[state.era].badge;
 
+    const amPill = document.getElementById("antimatterPill");
+    if (state.era >= 3 || state.antimatter > 0) {
+      amPill.style.display = "inline-block";
+      document.getElementById("antimatterDisplay").textContent = formatNum(state.antimatter);
+      document.getElementById("ampsDisplay").textContent = formatNum(getAmps());
+    } else {
+      amPill.style.display = "none";
+    }
+
     const dePill = document.getElementById("darkEnergyPill");
-    if (state.darkEnergy > 0) {
+    if (state.darkEnergy > 0 || state.totalDarkEnergyEarned > 0) {
       dePill.style.display = "inline-block";
-      document.getElementById("deBonusDisplay").textContent = `+${formatNum(state.darkEnergy * 20)}%`;
+      document.getElementById("deBonusDisplay").textContent = `${formatNum(state.darkEnergy)} DE (+${formatNum(state.darkEnergy * 25)}%)`;
     } else {
       dePill.style.display = "none";
     }
@@ -2693,12 +3108,31 @@
     updateStructuresBar();
   }
 
+  function buyResearch(id) {
+    const res = RESEARCH.find(r => r.id === id);
+    if (!res || state.era < res.era || state.research[id]) return;
+    if (state.energy < res.costE || state.antimatter < res.costA) return;
+
+    state.energy -= res.costE;
+    state.antimatter -= res.costA;
+    state.research[id] = true;
+    audio.playUpgrade();
+    cosmos3D.triggerUpgradePulse();
+    saveGame(false, true);
+    renderTab();
+    updateHUD();
+    showToast(`Research Unlocked: ${res.name}!`);
+  }
+
   function unlockEra(eraId) {
     if (eraId !== state.era + 1) return;
     const era = ERAS[eraId];
-    if (!era || state.matter < era.cost) return;
+    if (!era) return;
+    if (state.matter < era.costM || state.energy < era.costE || state.antimatter < era.costA) return;
 
-    state.matter -= era.cost;
+    state.matter -= era.costM;
+    state.energy -= era.costE;
+    state.antimatter -= era.costA;
     state.era = eraId;
     cosmos3D.setEra(eraId, false);
     audio.playTierUp();
@@ -2709,22 +3143,52 @@
     showToast(`Cosmic Scale Expanded: ${era.name}!`);
   }
 
+  function buyDePerk(id) {
+    const item = DE_SHOP.find(d => d.id === id);
+    if (!item) return;
+    const lv = state.deShop[id] || 0;
+    if (lv >= item.maxLv) return;
+    const cost = getDeShopCost(item);
+    if (state.darkEnergy < cost) return;
+
+    state.darkEnergy -= cost;
+    state.deShop[id] = lv + 1;
+    audio.playUpgrade();
+    cosmos3D.triggerUpgradePulse();
+    saveGame(false, true);
+    renderTab();
+    updateHUD();
+    updateStructuresBar();
+    showToast(`Singularity Perk Upgraded: ${item.name} Lv.${lv + 1}!`);
+  }
+
   function triggerBigCrunch() {
     const pendingDE = calculatePendingDarkEnergy();
-    if (state.era < 5 || pendingDE < 1) return;
+    if (state.era < 6 || pendingDE < 1) return;
 
-    if (!confirm(`Trigger the Big Crunch to reset progress and claim +${formatNum(pendingDE)} Dark Energy (+${formatNum(pendingDE * 20)}% permanent production)?`)) {
+    if (!confirm(`Trigger the Big Crunch to reset your run and claim +${formatNum(pendingDE)} Dark Energy (+25% permanent production per unspent DE, or spend in the Singularity Shop)?`)) {
       return;
     }
 
     const keptDE = state.darkEnergy + pendingDE;
+    const keptTotalDE = state.totalDarkEnergyEarned + pendingDE;
     const keptLifetime = state.lifetimeMatterEarned;
     const keptPrestiges = state.prestigeCount + 1;
+    const keptDeShop = { ...state.deShop };
 
     state = defaultState();
     state.darkEnergy = keptDE;
+    state.totalDarkEnergyEarned = keptTotalDE;
     state.lifetimeMatterEarned = keptLifetime;
     state.prestigeCount = keptPrestiges;
+    state.deShop = keptDeShop;
+
+    // Apply Primordial Seed starter bonus
+    const seedLv = state.deShop.de_starter || 0;
+    if (seedLv > 0) {
+      state.matter = Math.floor(600 * Math.pow(4.5, seedLv - 1));
+      state.energy = Math.floor(60 * Math.pow(3.8, seedLv - 1));
+    }
 
     cosmos3D.setEra(0, false);
     audio.playBigCrunch();
@@ -2739,10 +3203,11 @@
     const container = document.getElementById("tabContent");
     container.innerHTML = "";
 
+    /* --- TAB 1: GENERATORS & CLICK AMPLIFIERS --- */
     if (activeTab === "generators") {
       const clkHeader = document.createElement("div");
       clkHeader.className = "section-header";
-      clkHeader.innerHTML = `<span>👆 Click Amplifiers</span><span>Balanced 1.35x Cost</span>`;
+      clkHeader.innerHTML = `<span>👆 Click Amplifiers</span><span>1.42x Cost • 8% MPS Cap</span>`;
       container.appendChild(clkHeader);
 
       CLICK_UPGRADES.forEach(upg => {
@@ -2751,7 +3216,7 @@
         const cost = getClickCost(upg.baseCost, owned);
         const btn = document.createElement("button");
         btn.className = "upgrade-card";
-        btn.dataset.cost = cost;
+        btn.dataset.costM = cost;
         btn.disabled = state.matter < cost;
         btn.innerHTML = `
           <div class="card-icon">${upg.icon}</div>
@@ -2771,7 +3236,7 @@
 
       const genHeader = document.createElement("div");
       genHeader.className = "section-header";
-      genHeader.innerHTML = `<span>⚙️ Cosmic Generators</span><span>Global Mult: ${formatNum(getGlobalMultiplier())}x</span>`;
+      genHeader.innerHTML = `<span>⚙️ Cosmic Generators</span><span>Matter Mult: ${formatNum(getGlobalMatterMult())}x</span>`;
       container.appendChild(genHeader);
 
       GENERATORS.forEach(gen => {
@@ -2779,11 +3244,13 @@
         const lockedByEra = state.era < gen.era;
         const owned = state.generators[gen.id] || 0;
         const cost = getGenCost(gen.baseCost, owned);
-        const eachMps = gen.baseMps * getGlobalMultiplier();
+        const eachM = gen.mps * getGlobalMatterMult();
+        const eachE = gen.eps * getGlobalEnergyMult();
+        const eachA = gen.amps * getGlobalAntiMult();
 
         const btn = document.createElement("button");
         btn.className = "upgrade-card";
-        btn.dataset.cost = lockedByEra ? Infinity : cost;
+        btn.dataset.costM = lockedByEra ? Infinity : cost;
         btn.disabled = lockedByEra || state.matter < cost;
 
         if (lockedByEra) {
@@ -2798,13 +3265,15 @@
             </div>
           `;
         } else {
+          let prodLine = `+${formatNum(eachM)} 💠/s • +${formatNum(eachE)} ⚡/s`;
+          if (gen.amps > 0) prodLine += ` • +${formatNum(eachA)} ⚛️/s`;
           btn.innerHTML = `
             <div class="card-icon">${gen.icon}</div>
             <div class="card-body">
               <div class="card-title">${gen.name} <span class="era-tag">${ERAS[gen.era].name}</span></div>
               <div class="card-desc">${gen.desc}</div>
               <div class="card-visual-tag">✨ ${gen.visual}</div>
-              <div class="card-stats">+${formatNum(eachMps)} / sec each</div>
+              <div class="card-stats">${prodLine}</div>
             </div>
             <div class="card-right">
               <div class="card-cost">💠 ${formatNum(cost)}</div>
@@ -2815,8 +3284,61 @@
         }
         container.appendChild(btn);
       });
+    }
 
-    } else if (activeTab === "eras") {
+    /* --- TAB 2: RESEARCH LAB (ENERGY & ANTIMATTER TECHS) --- */
+    else if (activeTab === "research") {
+      const doneCount = Object.keys(state.research).filter(k => state.research[k]).length;
+      const header = document.createElement("div");
+      header.className = "section-header";
+      header.innerHTML = `<span>🔬 Cosmic Research Lab</span><span>Completed: ${doneCount} / ${RESEARCH.length}</span>`;
+      container.appendChild(header);
+
+      const visible = RESEARCH.filter(r => r.era <= state.era + 1);
+      visible.forEach(res => {
+        const bought = !!state.research[res.id];
+        const lockedByEra = state.era < res.era;
+        const canAfford = !bought && !lockedByEra && state.energy >= res.costE && state.antimatter >= res.costA;
+
+        const card = document.createElement("button");
+        card.className = `upgrade-card ${bought ? "unlocked-milestone" : ""}`;
+        card.dataset.costE = (bought || lockedByEra) ? Infinity : res.costE;
+        card.dataset.costA = (bought || lockedByEra) ? Infinity : res.costA;
+        card.disabled = bought || lockedByEra || !canAfford;
+
+        if (lockedByEra) {
+          card.innerHTML = `
+            <div class="card-icon">🔒</div>
+            <div class="card-body">
+              <div class="card-title">Classified Research <span class="era-tag">Era ${res.era + 1}</span></div>
+              <div class="card-desc">Reach ${ERAS[res.era].name} to unlock this breakthrough.</div>
+            </div>
+            <div class="card-right">
+              <div class="card-cost">Era ${res.era + 1}</div>
+            </div>
+          `;
+        } else {
+          let costHtml = bought
+            ? `<div class="card-cost" style="color:var(--accent-green)">✅ Active</div>`
+            : `<div class="card-cost energy">⚡ ${formatNum(res.costE)}</div>` +
+              (res.costA > 0 ? `<div class="card-cost antimatter">⚛️ ${formatNum(res.costA)}</div>` : "");
+
+          card.innerHTML = `
+            <div class="card-icon">${res.icon}</div>
+            <div class="card-body">
+              <div class="card-title">${res.name} <span class="era-tag">Era ${res.era + 1}</span></div>
+              <div class="card-desc">${res.desc}</div>
+            </div>
+            <div class="card-right">${costHtml}</div>
+          `;
+          if (!bought) card.addEventListener("click", () => buyResearch(res.id));
+        }
+        container.appendChild(card);
+      });
+    }
+
+    /* --- TAB 3: 10 COSMIC ERAS (MULTI-CURRENCY MILESTONES) --- */
+    else if (activeTab === "eras") {
       const header = document.createElement("div");
       header.className = "section-header";
       header.innerHTML = `<span>🌠 Cosmic Scale Progression</span><span>Current: Era ${state.era + 1} / ${ERAS.length}</span>`;
@@ -2825,42 +3347,57 @@
       ERAS.forEach(era => {
         const isUnlocked = state.era >= era.id;
         const isNext = state.era + 1 === era.id;
+        const canAfford = isNext && state.matter >= era.costM && state.energy >= era.costE && state.antimatter >= era.costA;
+
         const card = document.createElement("button");
         card.className = `upgrade-card ${isUnlocked ? "unlocked-milestone" : ""}`;
-        card.dataset.cost = isNext ? era.cost : Infinity;
-        card.disabled = isUnlocked || !isNext || state.matter < era.cost;
+        card.dataset.costM = isNext ? era.costM : Infinity;
+        card.dataset.costE = isNext ? era.costE : Infinity;
+        card.dataset.costA = isNext ? era.costA : Infinity;
+        card.disabled = isUnlocked || !isNext || !canAfford;
+
+        let rightHtml = "";
+        if (isUnlocked) {
+          rightHtml = `<div class="card-cost" style="color:var(--accent-green)">✅ Active</div>`;
+        } else if (isNext) {
+          rightHtml = `<div class="card-cost">💠 ${formatNum(era.costM)}</div>`;
+          if (era.costE > 0) rightHtml += `<div class="card-cost energy">⚡ ${formatNum(era.costE)}</div>`;
+          if (era.costA > 0) rightHtml += `<div class="card-cost antimatter">⚛️ ${formatNum(era.costA)}</div>`;
+        } else {
+          rightHtml = `<div class="card-cost">🔒 Locked</div>`;
+        }
 
         card.innerHTML = `
           <div class="card-icon">${era.badge.split(" ")[0]}</div>
           <div class="card-body">
-            <div class="card-title">${era.name}</div>
+            <div class="card-title">${era.name} <span class="era-tag">Era ${era.id + 1}</span></div>
             <div class="card-desc">${era.desc}</div>
             <div class="card-stats">${era.bonusText}</div>
           </div>
-          <div class="card-right">
-            <div class="card-cost">${isUnlocked ? "✅ Active" : (isNext ? `💠 ${formatNum(era.cost)}` : "🔒 Locked")}</div>
-          </div>
+          <div class="card-right">${rightHtml}</div>
         `;
         if (isNext) card.addEventListener("click", () => unlockEra(era.id));
         container.appendChild(card);
       });
+    }
 
-    } else if (activeTab === "prestige") {
+    /* --- TAB 4: BIG CRUNCH PRESTIGE & DARK ENERGY SINGULARITY SHOP --- */
+    else if (activeTab === "prestige") {
       const pendingDE = calculatePendingDarkEnergy();
       const box = document.createElement("div");
       box.className = "prestige-box";
       box.innerHTML = `
         <h2>🕳️ The Big Crunch</h2>
         <p>
-          Once you reach <strong>Era VI: Observable Universe</strong> (or ascend to <strong>Era VII: The Omniverse</strong> for massive payouts) and accumulate at least <strong>100.00T Run Matter</strong>, you can collapse spacetime into a singularity.
+          Reach <strong>Era VII: Observable Universe</strong> and accumulate at least <strong>${formatNum(1e19)} Run Matter</strong> to collapse spacetime into a singularity.
         </p>
         <p>
-          This resets your Matter, Generators, Click Amplifiers, and Cosmic Era back to Planet Earth, crystallizing your cosmic mass into permanent <strong>Dark Energy</strong> (+20% multiplicative production per unit + orbiting Dark Energy aura).
+          Resets Matter, Energy, Antimatter, Generators, Research, and Era back to Planet Earth in exchange for permanent <strong>Dark Energy (🌌)</strong>. Each unspent DE grants <strong>+25% production</strong>, or spend it below on permanent Singularity Perks.
         </p>
         <div class="prestige-metrics">
           <div class="metric-tile">
-            <div class="lbl">Current Dark Energy</div>
-            <div class="val" id="prestigeCurDE">${formatNum(state.darkEnergy)} (+${formatNum(state.darkEnergy * 20)}%)</div>
+            <div class="lbl">Unspent Dark Energy</div>
+            <div class="val" id="prestigeCurDE">${formatNum(state.darkEnergy)} (+${formatNum(state.darkEnergy * 25)}%)</div>
           </div>
           <div class="metric-tile">
             <div class="lbl">Claimable on Crunch</div>
@@ -2875,25 +3412,62 @@
             <div class="val" id="prestigeLifetimeVal">${formatNum(state.lifetimeMatterEarned)}</div>
           </div>
         </div>
-        <button class="crunch-btn" id="crunchActionBtn" ${(state.era < 5 || pendingDE < 1) ? "disabled" : ""}>
-          ${state.era < 5 ? "🔒 Reach Era VI: Observable Universe First" : (pendingDE < 1 ? "Need 100.00T Run Matter to Crunch" : `💥 Collapse Universe (+${formatNum(pendingDE)} Dark Energy)`)}
+        <button class="crunch-btn" id="crunchActionBtn" ${(state.era < 6 || pendingDE < 1) ? "disabled" : ""}>
+          ${state.era < 6 ? "🔒 Reach Era VII: Observable Universe First" : (pendingDE < 1 ? `Need ${formatNum(1e19)} Run Matter to Crunch` : `💥 Collapse Universe (+${formatNum(pendingDE)} Dark Energy)`)}
         </button>
       `;
       container.appendChild(box);
 
       const crunchBtn = document.getElementById("crunchActionBtn");
-      if (crunchBtn) {
-        crunchBtn.addEventListener("click", triggerBigCrunch);
-      }
+      if (crunchBtn) crunchBtn.addEventListener("click", triggerBigCrunch);
+
+      // Permanent Dark Energy Singularity Shop
+      const shopHeader = document.createElement("div");
+      shopHeader.className = "section-header";
+      shopHeader.innerHTML = `<span>🌌 Singularity Shop (Permanent)</span><span>Available: ${formatNum(state.darkEnergy)} DE</span>`;
+      container.appendChild(shopHeader);
+
+      DE_SHOP.forEach(item => {
+        const lv = state.deShop[item.id] || 0;
+        const maxed = lv >= item.maxLv;
+        const cost = getDeShopCost(item);
+
+        const card = document.createElement("button");
+        card.className = `upgrade-card ${maxed ? "unlocked-milestone" : ""}`;
+        card.dataset.costDe = maxed ? Infinity : cost;
+        card.disabled = maxed || state.darkEnergy < cost;
+        card.innerHTML = `
+          <div class="card-icon">${item.icon}</div>
+          <div class="card-body">
+            <div class="card-title">${item.name} <span class="era-tag">Lv.${lv}/${item.maxLv}</span></div>
+            <div class="card-desc">${item.desc}</div>
+          </div>
+          <div class="card-right">
+            <div class="card-cost dark">${maxed ? "✅ MAX" : `🌌 ${formatNum(cost)} DE`}</div>
+          </div>
+        `;
+        if (!maxed) card.addEventListener("click", () => buyDePerk(item.id));
+        container.appendChild(card);
+      });
     }
   }
 
   function refreshAffordability() {
-    const cards = document.querySelectorAll("#tabContent .upgrade-card[data-cost]");
+    const cards = document.querySelectorAll("#tabContent .upgrade-card");
     cards.forEach(card => {
       if (card.classList.contains("unlocked-milestone")) return;
-      const cost = Number(card.dataset.cost);
-      card.disabled = !Number.isFinite(cost) || state.matter < cost;
+      const cm = card.dataset.costM !== undefined ? Number(card.dataset.costM) : 0;
+      const ce = card.dataset.costE !== undefined ? Number(card.dataset.costE) : 0;
+      const ca = card.dataset.costA !== undefined ? Number(card.dataset.costA) : 0;
+      const cde = card.dataset.costDe !== undefined ? Number(card.dataset.costDe) : 0;
+
+      const impossible = !Number.isFinite(cm) || !Number.isFinite(ce) || !Number.isFinite(ca) || !Number.isFinite(cde);
+      const affordable = !impossible &&
+        state.matter >= cm &&
+        state.energy >= ce &&
+        state.antimatter >= ca &&
+        state.darkEnergy >= cde;
+      card.disabled = !affordable;
     });
 
     if (activeTab === "prestige") {
@@ -2905,11 +3479,11 @@
       if (pendingEl) pendingEl.textContent = `+${formatNum(pendingDE)} DE`;
       if (lifeEl) lifeEl.textContent = formatNum(state.lifetimeMatterEarned);
       if (btn) {
-        btn.disabled = state.era < 5 || pendingDE < 1;
-        if (state.era < 5) {
-          btn.textContent = "🔒 Reach Era VI: Observable Universe First";
+        btn.disabled = state.era < 6 || pendingDE < 1;
+        if (state.era < 6) {
+          btn.textContent = "🔒 Reach Era VII: Observable Universe First";
         } else if (pendingDE < 1) {
-          btn.textContent = "Need 100.00T Run Matter to Crunch";
+          btn.textContent = `Need ${formatNum(1e19)} Run Matter to Crunch`;
         } else {
           btn.textContent = `💥 Collapse Universe (+${formatNum(pendingDE)} Dark Energy)`;
         }
@@ -2918,7 +3492,7 @@
   }
 
   /* =========================================================================
-     10. EVENT WIRING & MAIN LOOP
+     10. EVENT WIRING & MAIN LOOP (AUTO-HARVESTER + 4 CURRENCIES + AUTO-SAVE)
   ========================================================================= */
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -2958,21 +3532,47 @@
   let lastFrameTime = performance.now();
   let uiAccumulator = 0;
   let saveAccumulator = 0;
+  let autoClickAccumulator = 0;
 
   function gameLoop(now) {
     const dt = Math.min(0.1, (now - lastFrameTime) / 1000);
     lastFrameTime = now;
 
+    // 1. Passive 3-Currency Generation (Matter, Energy, Antimatter)
     const mps = getMps();
+    const eps = getEps();
+    const amps = getAmps();
+
     if (mps > 0) {
-      const gained = mps * dt;
-      state.matter += gained;
-      state.runMatterEarned += gained;
-      state.lifetimeMatterEarned += gained;
+      const gainedM = mps * dt;
+      state.matter += gainedM;
+      state.runMatterEarned += gainedM;
+      state.lifetimeMatterEarned += gainedM;
+    }
+    if (eps > 0) state.energy += eps * dt;
+    if (amps > 0) state.antimatter += amps * dt;
+
+    // 2. Quantum Auto-Harvester Drone (from Singularity Shop)
+    const droneLv = state.deShop.de_drone || 0;
+    if (droneLv > 0) {
+      autoClickAccumulator += dt * (droneLv * 2);
+      if (autoClickAccumulator >= 1) {
+        const clicks = Math.floor(autoClickAccumulator);
+        autoClickAccumulator -= clicks;
+        const autoM = getMpc() * clicks;
+        const autoE = getEpc() * clicks;
+        state.matter += autoM;
+        state.energy += autoE;
+        state.runMatterEarned += autoM;
+        state.lifetimeMatterEarned += autoM;
+        cosmos3D.pulse = Math.max(cosmos3D.pulse, 0.25);
+      }
     }
 
+    // 3. Dedicated Full-FPS 3D Render
     cosmos3D.render(now, dt);
 
+    // 4. Throttled HUD & Affordability Updates (~12Hz)
     uiAccumulator += dt;
     if (uiAccumulator >= 0.08) {
       uiAccumulator = 0;
@@ -2980,6 +3580,7 @@
       refreshAffordability();
     }
 
+    // 5. Reliable Auto-Save every 10 seconds
     saveAccumulator += dt;
     if (saveAccumulator >= 10) {
       saveAccumulator = 0;
