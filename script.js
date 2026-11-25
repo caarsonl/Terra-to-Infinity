@@ -837,12 +837,14 @@
         }
 
         float craterHeight(vec3 p) {
-          float h = fbm4(p * 3.4) * 0.48 + fbm4(p * 12.0) * 0.22;
-          float c1 = abs(snoise(p * 4.6 + vec3(1.2, 3.4, 2.1)));
-          float c2 = abs(snoise(p * 9.8 + vec3(7.1, 2.2, 5.8)));
-          float bowl1 = smoothstep(0.0, 0.24, c1) - 0.38 * smoothstep(0.16, 0.26, c1) * (1.0 - smoothstep(0.26, 0.36, c1));
-          float bowl2 = smoothstep(0.0, 0.22, c2) - 0.30 * smoothstep(0.14, 0.24, c2) * (1.0 - smoothstep(0.24, 0.32, c2));
-          return h + bowl1 * 0.35 + bowl2 * 0.2;
+          float h = fbm4(p * 2.6) * 0.55 + fbm4(p * 6.0) * 0.16;
+          float n1 = snoise(p * 3.8 + vec3(1.2, 3.4, 2.1));
+          float n2 = snoise(p * 7.5 + vec3(7.1, 2.2, 5.8));
+          float pit1 = smoothstep(0.42, 0.72, n1);
+          float rim1 = smoothstep(0.28, 0.44, n1) * (1.0 - smoothstep(0.44, 0.60, n1));
+          float pit2 = smoothstep(0.48, 0.78, n2);
+          float rim2 = smoothstep(0.34, 0.50, n2) * (1.0 - smoothstep(0.50, 0.64, n2));
+          return h - pit1 * 0.26 + rim1 * 0.10 - pit2 * 0.14 + rim2 * 0.06;
         }
 
         void main() {
@@ -950,9 +952,10 @@
             vec3 cloudCol = mix(vec3(0.95, 0.98, 1.0), vec3(0.82, 0.87, 0.94), cloudThick * 0.48) * (0.055 + max(0.0, ndotl) * 1.06);
             col = mix(litSurface, cloudCol, cloudMask * 0.9);
 
-            // Sunset Terminator Scattering
-            float sunset = exp(-pow((ndotl - 0.01) * 5.6, 2.0)) * (1.0 - cloudMask * 0.25);
-            col += vec3(0.58, 0.20, 0.06) * sunset * 0.46;
+            // Delicate Sunset Terminator Twilight
+            float twilight = exp(-pow((ndotl - 0.03) * 14.0, 2.0));
+            float limbBoost = 0.22 + 0.78 * pow(max(0.0, 1.0 + vz), 1.6);
+            col += vec3(0.45, 0.16, 0.05) * twilight * limbBoost * (0.12 + cloudMask * 0.12);
 
             // Night-Side Aurora Borealis
             float nightMask = smoothstep(0.08, -0.22, ndotl);
@@ -981,20 +984,20 @@
           // ==================== 1: HD CRATERED MOON ====================
           else if (uType < 1.5) {
             float h = craterHeight(P);
-            float eps = 0.014;
+            float eps = 0.02;
             vec3 tx = normalize(cross(abs(N.y) < 0.9 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0), N));
             vec3 ty = cross(N, tx);
             float hX = craterHeight(rotYVec(normalize(N + tx * eps), uSpin));
             float hY = craterHeight(rotYVec(normalize(N + ty * eps), uSpin));
-            vec3 bumpN = normalize(N - tx * (hX - h) * 9.0 - ty * (hY - h) * 9.0);
+            vec3 bumpN = normalize(N - tx * (hX - h) * 3.2 - ty * (hY - h) * 3.2);
 
             float maria = fbm4(P * 1.7 + vec3(4.2, 2.8, 1.1));
-            vec3 regolith = mix(vec3(0.38, 0.40, 0.44), vec3(0.78, 0.79, 0.81), smoothstep(0.35, 0.72, maria));
-            regolith *= 0.82 + h * 0.34;
+            vec3 regolith = mix(vec3(0.36, 0.38, 0.42), vec3(0.76, 0.77, 0.79), smoothstep(0.34, 0.72, maria));
+            regolith *= 0.84 + h * 0.28;
 
             float diff = max(0.0, dot(bumpN, L));
-            vec3 earthshine = vec3(0.15, 0.21, 0.32) * (0.55 + 0.45 * max(0.0, -vz));
-            col = regolith * (earthshine + vec3(1.04, 1.02, 0.98) * diff);
+            vec3 earthshine = vec3(0.10, 0.14, 0.22) * (0.45 + 0.55 * max(0.0, -vz));
+            col = regolith * (earthshine + vec3(1.02, 1.00, 0.96) * diff);
 
             if (uExtraBoost > 0.0) {
               float domeCluster = fbm4(P * 9.0 + vec3(1.1, 6.2, 2.7));
@@ -1173,9 +1176,15 @@
       const vp = clamp(Math.ceil(drawRadius * 2 * dpr), 48, this.maxRes);
       const vy = this.maxRes - vp;
 
+      const pad = 2;
+      const scW = Math.min(this.maxRes, vp + pad);
+      const scY = Math.max(0, vy - pad);
+      const scH = Math.min(this.maxRes - scY, vp + pad);
+
+      gl.scissor(0, scY, scW, scH);
+      gl.clear(gl.COLOR_BUFFER_BIT);
       gl.viewport(0, vy, vp, vp);
       gl.scissor(0, vy, vp, vp);
-      gl.clear(gl.COLOR_BUFFER_BIT);
 
       const {
         rotX = 0, rotY = 0, spin = 0, time = 0,
