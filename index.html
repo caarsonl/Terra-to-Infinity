@@ -18,9 +18,10 @@
           <div class="era-badge" id="eraBadge">🌍 Era I: Planet Earth</div>
         </div>
         <div class="controls-bar">
-          <button class="icon-btn" id="muteBtn" title="Toggle Procedural Audio">🔊 Sound On</button>
-          <button class="icon-btn" id="saveBtn" title="Save Progress">💾 Save</button>
-          <button class="icon-btn danger" id="resetBtn" title="Wipe Save Data">♻️ Hard Reset</button>
+          <button class="icon-btn" id="musicBtn" title="Toggle Procedural Cosmic Music">🎵 Music On</button>
+          <button class="icon-btn" id="sfxBtn" title="Toggle Sound Effects">🔊 SFX On</button>
+          <button class="icon-btn" id="saveBtn" title="Manual Save (Auto-Save Active)">💾 Save</button>
+          <button class="icon-btn danger" id="resetBtn" title="Wipe Save Data">♻️ Reset</button>
         </div>
       </div>
 
@@ -36,10 +37,13 @@
 
       <div class="hud-bottom">
         <div class="hud-left-meta">
-          <div class="structures-bar" id="structuresBar">No 3D megastructures built yet</div>
+          <div class="structures-bar" id="structuresBar">Purchase upgrades to construct 3D structures</div>
           <div class="controls-hint">🖱️ Click to harvest • Drag to orbit 3D • Scroll to zoom</div>
         </div>
-        <span id="totalEarnedDisplay">Run Matter: 0</span>
+        <div class="hud-right-meta">
+          <span class="autosave-badge" id="autoSaveStatus">💾 Auto-Save Active</span>
+          <span id="totalEarnedDisplay">Run Matter: 0</span>
+        </div>
       </div>
     </section>
 
